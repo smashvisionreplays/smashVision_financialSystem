@@ -7,7 +7,7 @@ export function usePeople() {
     queryKey: ['people'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('finance_people')
+        .from('people')
         .select('*')
         .order('name');
       if (error) throw error;

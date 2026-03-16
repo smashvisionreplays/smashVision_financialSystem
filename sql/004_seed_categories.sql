@@ -1,5 +1,5 @@
 -- Seed Categories
-INSERT INTO finance_categories (name, type) VALUES
+INSERT INTO finance.categories (name, type) VALUES
   -- Expense categories
   ('Infrastructure', 'expense'),
   ('Services', 'expense'),

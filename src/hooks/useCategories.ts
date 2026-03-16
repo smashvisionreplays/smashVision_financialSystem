@@ -7,7 +7,7 @@ export function useCategories() {
     queryKey: ['categories'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('finance_categories')
+        .from('categories')
         .select('*')
         .order('name');
       if (error) throw error;

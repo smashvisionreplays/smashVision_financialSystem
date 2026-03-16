@@ -7,7 +7,7 @@ export function useClubs() {
     queryKey: ['clubs'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('finance_clubs')
+        .from('clubs')
         .select('*')
         .order('name');
       if (error) throw error;

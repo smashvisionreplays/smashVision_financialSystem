@@ -7,12 +7,12 @@ export function useTransactions(filters?: TransactionFilters) {
     queryKey: ['transactions', filters],
     queryFn: async () => {
       let query = supabase
-        .from('finance_transactions')
+        .from('transactions')
         .select(`
           *,
-          club:finance_clubs(*),
-          person:finance_people(*),
-          category:finance_categories(*)
+          club:clubs(*),
+          person:people(*),
+          category:categories(*)
         `)
         .order('date', { ascending: false });
 
@@ -58,7 +58,7 @@ export function useCreateTransaction() {
         notes: data.notes || null,
       };
       const { data: result, error } = await supabase
-        .from('finance_transactions')
+        .from('transactions')
         .insert(payload)
         .select()
         .single();
@@ -84,7 +84,7 @@ export function useUpdateTransaction() {
         notes: data.notes || null,
       };
       const { data: result, error } = await supabase
-        .from('finance_transactions')
+        .from('transactions')
         .update(payload)
         .eq('id', id)
         .select()
@@ -104,7 +104,7 @@ export function useDeleteTransaction() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
-        .from('finance_transactions')
+        .from('transactions')
         .delete()
         .eq('id', id);
       if (error) throw error;

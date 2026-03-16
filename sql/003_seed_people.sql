@@ -1,8 +1,8 @@
 -- Seed People
-INSERT INTO finance_people (name, role) VALUES
+INSERT INTO finance.people (name, role) VALUES
   ('César Castaño', 'founder'),
   ('Tomás Ossa', 'founder'),
-  ('Smash Vision', 'collaborator'),
+  ('Smash Vision', 'company'),
   ('Paola Marin', 'investor'),
   ('Julio Castaño', 'investor'),
   ('Juan Ossa', 'investor'),

@@ -1,6 +1,6 @@
 # Smash Vision - Financial System
 
-Internal financial dashboard for **Smash Vision**, a company that installs camera recording systems in padel clubs across Mexico and Colombia. Built with React, TypeScript, and Supabase.
+Internal financial dashboard for **Smash Vision**, a company that installs camera recording systems in padel clubs across Mexico and Colombia. Built with React 19, TypeScript, and Supabase.
 
 ## Features
 
@@ -14,7 +14,7 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 + TypeScript |
+| Frontend | React 19 + TypeScript |
 | Build | Vite |
 | Styling | Tailwind CSS (custom dark theme) |
 | Charts | Recharts |
@@ -36,12 +36,12 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 
 ## Database Schema
 
-The system uses 4 tables (prefixed with `finance_` to coexist with the recordingSystem DB):
+The system uses a dedicated `finance` schema in PostgreSQL (separate from the `public` schema used by the recordingSystem):
 
-- **`finance_clubs`**: Padel clubs (Padel Nation, Smash Padel, Padeling Pance, Prime Padel)
-- **`finance_people`**: Team members and investors
-- **`finance_categories`**: Expense and income categories
-- **`finance_transactions`**: All financial records with multi-currency support
+- **`finance.clubs`**: Padel clubs (Padel Nation, Smash Padel, Padeling Pance, Prime Padel)
+- **`finance.people`**: Team members and investors
+- **`finance.categories`**: Expense and income categories
+- **`finance.transactions`**: All financial records with multi-currency support
 
 ### Transaction Types
 - `expense` - Money spent (materials, services, installation, etc.)
@@ -84,7 +84,8 @@ VITE_SUPABASE_ANON_KEY=your-anon-key-here
 
 Go to your Supabase project's **SQL Editor** and run the SQL files in order:
 
-1. `sql/001_schema.sql` - Creates tables, indexes, triggers, and RLS policies
+0. `sql/000_cleanup_public.sql` - *(Optional)* Removes old `finance_` prefixed tables from the public schema
+1. `sql/001_schema.sql` - Creates the `finance` schema, tables, indexes, triggers, and RLS policies
 2. `sql/002_seed_clubs.sql` - Inserts the 4 clubs
 3. `sql/003_seed_people.sql` - Inserts team members and investors
 4. `sql/004_seed_categories.sql` - Inserts expense and income categories

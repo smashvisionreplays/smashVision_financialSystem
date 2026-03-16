@@ -10,7 +10,7 @@ export interface Club {
 export interface Person {
   id: string;
   name: string;
-  role: 'founder' | 'investor' | 'collaborator';
+  role: 'founder' | 'investor' | 'collaborator' | 'company';
   created_at: string;
 }
 
