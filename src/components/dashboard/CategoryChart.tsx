@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Transaction } from '../../types';
+import type { Transaction } from '../../types';
 
 interface CategoryChartProps {
   transactions: Transaction[];

@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react';
-import { TransactionFilters as TFilters, TransactionType } from '../../types';
+import type { TransactionFilters as TFilters, TransactionType } from '../../types';
 import { useClubs } from '../../hooks/useClubs';
 import { usePeople } from '../../hooks/usePeople';
 import { useCategories } from '../../hooks/useCategories';

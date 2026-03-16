@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { Club } from '../types';
+import type { Club } from '../types';
 
 export function useClubs() {
   return useQuery<Club[]>({

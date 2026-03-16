@@ -1,6 +1,6 @@
 import { TrendingUp, TrendingDown, DollarSign, Wallet } from 'lucide-react';
 import { formatCurrency } from '../../lib/formatters';
-import { Transaction } from '../../types';
+import type { Transaction } from '../../types';
 
 interface KPICardsProps {
   transactions: Transaction[];

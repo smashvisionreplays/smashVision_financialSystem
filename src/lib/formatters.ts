@@ -1,4 +1,4 @@
-import { Currency, TransactionType } from '../types';
+import type { Currency, TransactionType } from '../types';
 
 export function formatCurrency(amount: number, currency: Currency = 'USD'): string {
   const symbols: Record<Currency, string> = {

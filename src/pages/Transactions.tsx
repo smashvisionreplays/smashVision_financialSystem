@@ -6,7 +6,7 @@ import TransactionFiltersComponent from '../components/transactions/TransactionF
 import TransactionTable from '../components/transactions/TransactionTable';
 import TransactionModal from '../components/transactions/TransactionModal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
-import { Transaction, TransactionFormData, TransactionFilters } from '../types';
+import type { Transaction, TransactionFormData, TransactionFilters } from '../types';
 
 export default function Transactions() {
   const [filters, setFilters] = useState<TransactionFilters>({

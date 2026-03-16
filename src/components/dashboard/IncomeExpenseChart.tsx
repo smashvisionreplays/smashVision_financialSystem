@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Transaction } from '../../types';
+import type { Transaction } from '../../types';
 
 interface IncomeExpenseChartProps {
   transactions: Transaction[];

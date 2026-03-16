@@ -4,7 +4,7 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 
 ## Features
 
-- **Dashboard**: KPI cards (income, expenses, net profit, withdrawals), monthly income vs expense bar chart, net profit trend line, income by club donut chart, expenses by category donut chart, recent transactions table
+- **Dashboard**: Financial overview with KPI cards (income, expenses, net profit, withdrawals), monthly income vs expense bar chart, net profit trend line, income by club donut chart, expenses by category donut chart, and recent transactions table. Includes a comprehensive filter bar with year quick-select buttons (All Time, 2026, 2025, 2024), transaction type, club, category, person, and custom date range filters. All charts and KPIs update dynamically based on the active filters
 - **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination
 - **Clubs**: Financial summary cards per club showing income, expenses, net profit, and transaction count
 - **People**: Team members and investors overview with expenses, reimbursements, withdrawals, gap contributions, and owed balance
@@ -107,7 +107,7 @@ The app will be available at `http://localhost:5173`
 src/
 ├── components/
 │   ├── layout/          # Sidebar, Layout wrapper
-│   ├── dashboard/       # KPI cards, charts
+│   ├── dashboard/       # KPI cards, charts, filters
 │   ├── transactions/    # Table, filters, modal form
 │   ├── clubs/           # Club summary cards
 │   ├── people/          # People summary cards

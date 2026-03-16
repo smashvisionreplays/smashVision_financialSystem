@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Transaction } from '../../types';
+import type { Transaction } from '../../types';
 import { formatCurrency, formatDate, transactionTypeLabels, transactionTypeColors } from '../../lib/formatters';
 
 interface TransactionTableProps {

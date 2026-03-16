@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { Category } from '../types';
+import type { Category } from '../types';
 
 export function useCategories() {
   return useQuery<Category[]>({

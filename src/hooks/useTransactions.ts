@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabase';
-import { Transaction, TransactionFormData, TransactionFilters } from '../types';
+import type { Transaction, TransactionFormData, TransactionFilters } from '../types';
 
 export function useTransactions(filters?: TransactionFilters) {
   return useQuery<Transaction[]>({

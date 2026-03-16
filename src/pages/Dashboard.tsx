@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
+import type { TransactionFilters } from '../types';
+import DashboardFilters from '../components/dashboard/DashboardFilters';
 import KPICards from '../components/dashboard/KPICards';
 import IncomeExpenseChart from '../components/dashboard/IncomeExpenseChart';
 import ClubBreakdownChart from '../components/dashboard/ClubBreakdownChart';
@@ -7,13 +9,21 @@ import CategoryChart from '../components/dashboard/CategoryChart';
 import TrendChart from '../components/dashboard/TrendChart';
 import { formatDate, transactionTypeLabels, transactionTypeColors, formatCurrency } from '../lib/formatters';
 
+const emptyFilters: TransactionFilters = {
+  type: '',
+  club_id: '',
+  person_id: '',
+  category_id: '',
+  date_from: '',
+  date_to: '',
+  search: '',
+};
+
 export default function Dashboard() {
-  const [year, setYear] = useState<string>('');
-  const { data: transactions, isLoading } = useTransactions(
-    year
-      ? { type: '', club_id: '', person_id: '', category_id: '', date_from: `${year}-01-01`, date_to: `${year}-12-31`, search: '' }
-      : undefined
-  );
+  const [filters, setFilters] = useState<TransactionFilters>({ ...emptyFilters });
+
+  const hasFilters = Object.values(filters).some((v) => v !== '');
+  const { data: transactions, isLoading } = useTransactions(hasFilters ? filters : undefined);
 
   if (isLoading) {
     return (
@@ -27,22 +37,12 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-sv-white">Dashboard</h1>
-          <p className="text-sv-gray-text text-sm mt-1">Financial overview of Smash Vision</p>
-        </div>
-        <select
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          className="bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-2 text-sm text-sv-white focus:outline-none focus:border-sv-lime/50"
-        >
-          <option value="">All Time</option>
-          <option value="2026">2026</option>
-          <option value="2025">2025</option>
-          <option value="2024">2024</option>
-        </select>
+      <div>
+        <h1 className="text-2xl font-bold text-sv-white">Dashboard</h1>
+        <p className="text-sv-gray-text text-sm mt-1">Financial overview of Smash Vision</p>
       </div>
+
+      <DashboardFilters filters={filters} onChange={setFilters} />
 
       <KPICards transactions={data} />
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { Transaction, TransactionFormData, TransactionType, Currency } from '../../types';
+import type { Transaction, TransactionFormData, TransactionType, Currency } from '../../types';
 import { useClubs } from '../../hooks/useClubs';
 import { usePeople } from '../../hooks/usePeople';
 import { useCategories } from '../../hooks/useCategories';
