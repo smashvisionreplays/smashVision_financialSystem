@@ -4,7 +4,7 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 
 ## Features
 
-- **Dashboard**: Financial overview with KPI cards (income, expenses, net profit, withdrawals), monthly income vs expense bar chart, net profit trend line, income by club donut chart, expenses by category donut chart, and recent transactions table. Includes a comprehensive filter bar with year quick-select buttons (All Time, 2026, 2025, 2024), transaction type, club, category, person, and custom date range filters. All charts and KPIs update dynamically based on the active filters
+- **Dashboard**: Cash balance card (all-time, unaffected by filters), KPI cards (income, expenses, net profit, withdrawals), monthly income vs expense bar chart, net profit trend line, income by club donut chart, expenses by category donut chart, and recent transactions table. Includes a comprehensive filter bar with year quick-select buttons (All Time, 2026, 2025, 2024), transaction type, club, category, person, and custom date range filters. All charts and KPIs update dynamically based on the active filters
 - **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination
 - **Clubs**: Financial summary cards per club showing income, expenses, net profit, and transaction count
 - **People**: Team members and investors overview with expenses, reimbursements, withdrawals, gap contributions, and owed balance
@@ -44,11 +44,36 @@ The system uses a dedicated `finance` schema in PostgreSQL (separate from the `p
 - **`finance.transactions`**: All financial records with multi-currency support
 
 ### Transaction Types
-- `expense` - Money spent (materials, services, installation, etc.)
-- `income` - Money received from clubs
-- `withdrawal` - Founder withdrawals
-- `reimbursement` - Paying back investors/team for their expenses
-- `gap_contribution` - Contributions to cover accounting gaps
+
+| Type | Description | Affects Profit? | Affects Cash? |
+|------|-------------|:-:|:-:|
+| `expense` | Money spent on the business (materials, services, installation, etc.). Tracked per person — can be a personal expense (founder/investor paid) or a company expense (Smash Vision paid) | Yes | Only if person = Smash Vision |
+| `income` | Revenue received from clubs for camera services | Yes | Yes |
+| `withdrawal` | Founders taking money out of the company. This is a profit distribution, not a business cost | No | Yes |
+| `reimbursement` | Company paying back a person who already covered an expense. The cost was already recorded as an `expense`, so the reimbursement is only a cash movement | No | Yes |
+| `gap_contribution` | Founders injecting personal money to cover a cash shortfall. This is a capital contribution, not revenue | No | Yes |
+
+### Financial Calculations
+
+**Net Profit/Loss** = `Income − Expenses`
+
+Only income and expenses affect profitability. Withdrawals, reimbursements, and gap contributions are cash flow events that don't change how profitable the business is:
+- A reimbursement pays back a personal expense already counted → subtracting it again would double-count the cost
+- A withdrawal is a founder taking earned profit out → it's a distribution, not a cost
+- A gap contribution is a founder covering a cash shortfall → it's capital, not revenue
+
+**Cash Balance** = `Income + Gap Contributions − Company Expenses − Withdrawals − Reimbursements`
+
+The cash balance tracks actual money in the company account. Key distinction: only expenses made **by Smash Vision** (the company entity, `person.role = 'company'`) affect cash. Personal expenses by founders or investors were paid from their own pockets and don't reduce the company's cash — unless a reimbursement is issued.
+
+| Event | Profit impact | Cash impact |
+|-------|:---:|:---:|
+| Club pays $500 for camera service (income) | +$500 | +$500 |
+| Smash Vision pays $100 for AWS (company expense) | −$100 | −$100 |
+| César pays $50 for Ubers from his pocket (personal expense) | −$50 | — |
+| Company reimburses César $50 for the Ubers | — | −$50 |
+| César withdraws $200 profit | — | −$200 |
+| Tomás contributes $30 to cover a cash gap | — | +$30 |
 
 ## Setup
 

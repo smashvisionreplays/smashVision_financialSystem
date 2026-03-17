@@ -484,3 +484,8 @@ INSERT INTO finance.transactions (date, type, original_amount, original_currency
 VALUES
 ('2025-12-01', 'withdrawal', 263.00, 'USD', 1, 263.00, 'Retiro 2025', NULL, NULL, (SELECT id FROM finance.people WHERE name = 'César Castaño'), NULL),
 ('2025-12-01', 'withdrawal', 263.00, 'USD', 1, 263.00, 'Retiro 2025', NULL, NULL, (SELECT id FROM finance.people WHERE name = 'Tomás Ossa'), NULL);
+
+-- Accounting adjustment: 2025 desfase (gap between theoretical and real cash balance)
+INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
+VALUES
+('2025-12-31', 'expense', 26.68, 'USD', 1, 26.68, 'Desfase contable 2025', 'Diferencia entre caja teórica ($232.68) y caja real ($210.00) al cierre de 2025. Ajuste para reconciliar.', NULL, (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Accounting Adjustment' AND type = 'expense'));

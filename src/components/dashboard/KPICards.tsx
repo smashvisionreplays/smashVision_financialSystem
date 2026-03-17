@@ -19,15 +19,11 @@ export default function KPICards({ transactions }: KPICardsProps) {
     .filter((t) => t.type === 'withdrawal')
     .reduce((sum, t) => sum + t.usd_amount, 0);
 
-  const totalReimbursements = transactions
-    .filter((t) => t.type === 'reimbursement')
-    .reduce((sum, t) => sum + t.usd_amount, 0);
-
-  const totalGapContributions = transactions
-    .filter((t) => t.type === 'gap_contribution')
-    .reduce((sum, t) => sum + t.usd_amount, 0);
-
-  const netProfit = totalIncome - totalExpenses - totalWithdrawals - totalReimbursements + totalGapContributions;
+  // Net Profit = Income - Expenses (only)
+  // Withdrawals, reimbursements, and gap contributions are cash flow events,
+  // NOT profit/loss events. Reimbursements pay back personal expenses already
+  // counted; withdrawals are profit distributions; gap contributions are capital.
+  const netProfit = totalIncome - totalExpenses;
 
   const cards = [
     {

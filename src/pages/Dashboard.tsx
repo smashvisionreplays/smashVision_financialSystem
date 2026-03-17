@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { Landmark } from 'lucide-react';
 import { useTransactions } from '../hooks/useTransactions';
 import type { TransactionFilters } from '../types';
 import DashboardFilters from '../components/dashboard/DashboardFilters';
@@ -24,6 +25,20 @@ export default function Dashboard() {
 
   const hasFilters = Object.values(filters).some((v) => v !== '');
   const { data: transactions, isLoading } = useTransactions(hasFilters ? filters : undefined);
+  // All-time query for cash balance (never filtered)
+  const { data: allTransactions } = useTransactions();
+
+  const cashBalance = useMemo(() => {
+    if (!allTransactions) return 0;
+    return allTransactions.reduce((sum, t) => {
+      if (t.type === 'income' || t.type === 'gap_contribution') return sum + t.usd_amount;
+      if (t.type === 'withdrawal' || t.type === 'reimbursement') return sum - t.usd_amount;
+      // Only company expenses (person = Smash Vision) affect cash balance;
+      // personal expenses by founders/investors are tracked separately
+      if (t.type === 'expense' && t.person?.role === 'company') return sum - t.usd_amount;
+      return sum;
+    }, 0);
+  }, [allTransactions]);
 
   if (isLoading) {
     return (
@@ -43,6 +58,22 @@ export default function Dashboard() {
       </div>
 
       <DashboardFilters filters={filters} onChange={setFilters} />
+
+      {/* Cash Balance - always all-time */}
+      <div className={`bg-sv-dark rounded-xl border ${cashBalance >= 0 ? 'border-sv-lime/30' : 'border-red-500/30'} p-6`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sv-gray-text text-sm font-medium mb-1">Smash Vision Cash Balance</p>
+            <p className={`text-3xl font-bold ${cashBalance >= 0 ? 'text-sv-lime' : 'text-red-400'}`}>
+              {cashBalance >= 0 ? '' : '-'}{formatCurrency(Math.abs(cashBalance))}
+            </p>
+            <p className="text-sv-gray-text text-xs mt-1">All-time cumulative balance</p>
+          </div>
+          <div className={`p-3 rounded-xl ${cashBalance >= 0 ? 'bg-sv-lime/10' : 'bg-red-500/10'}`}>
+            <Landmark size={28} className={cashBalance >= 0 ? 'text-sv-lime' : 'text-red-400'} />
+          </div>
+        </div>
+      </div>
 
       <KPICards transactions={data} />
 

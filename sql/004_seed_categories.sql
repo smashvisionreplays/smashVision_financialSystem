@@ -14,6 +14,7 @@ INSERT INTO finance.categories (name, type) VALUES
   ('Commissions', 'expense'),
   ('Refund', 'expense'),
   ('Other Expense', 'expense'),
+  ('Accounting Adjustment', 'expense'),
   -- Income categories
   ('Camera Service', 'income'),
   ('Installation Fee', 'income'),
