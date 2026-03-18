@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS finance.clubs (
   country TEXT,
   city TEXT,
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  number_cameras INTEGER NOT NULL DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

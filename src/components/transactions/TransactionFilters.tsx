@@ -47,7 +47,7 @@ export default function TransactionFiltersComponent({ filters, onChange }: Trans
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3">
         {/* Search */}
         <div className="relative xl:col-span-2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-sv-gray-text" size={14} />
@@ -98,6 +98,20 @@ export default function TransactionFiltersComponent({ filters, onChange }: Trans
           {people?.map((person) => (
             <option key={person.id} value={person.id}>
               {person.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Category */}
+        <select
+          value={filters.category_id}
+          onChange={(e) => update('category_id', e.target.value)}
+          className="bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-2 text-sm text-sv-white focus:outline-none focus:border-sv-lime/50"
+        >
+          <option value="">All Categories</option>
+          {categories?.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name} ({cat.type})
             </option>
           ))}
         </select>

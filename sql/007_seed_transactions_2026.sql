@@ -1,6 +1,6 @@
 -- Seed Transactions 2026
 -- 3 active clubs: Prime Padel, Smash Padel, Padeling Pance
--- Shared "Todos" expenses split equally among all 3 clubs
+-- Shared "Todos" expenses split proportionally by number of cameras (2:2:4)
 
 -- ============================================
 -- ENERO 2026
@@ -36,61 +36,61 @@ VALUES
 ('2026-02-01', 'expense', 5.44, 'USD', 1, 5.44, 'Arreglo de multímetro y fuente de poder', NULL, (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Equipment' AND type = 'expense')),
 ('2026-02-01', 'expense', 11.00, 'USD', 1, 11.00, 'Pintura para canaletas', NULL, (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Materials' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Claude $10 split 3 ways (PP + SP + Padeling)
+-- Expenses: Smash Vision - Shared Claude $10 split by cameras 2:2:4 (PP + SP + Padeling)
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 3.33, 'USD', 1, 3.33, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
-('2026-02-01', 'expense', 3.33, 'USD', 1, 3.33, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
-('2026-02-01', 'expense', 3.34, 'USD', 1, 3.34, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense'));
+('2026-02-01', 'expense', 2.50, 'USD', 1, 2.50, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
+('2026-02-01', 'expense', 2.50, 'USD', 1, 2.50, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
+('2026-02-01', 'expense', 5.00, 'USD', 1, 5.00, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Extensión CF $20 split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $20 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 6.67, 'USD', 1, 6.67, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 6.67, 'USD', 1, 6.67, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 6.66, 'USD', 1, 6.66, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 5.00, 'USD', 1, 5.00, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 5.00, 'USD', 1, 5.00, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 10.00, 'USD', 1, 10.00, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Extensión CF $17.20 split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $17.20 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 5.73, 'USD', 1, 5.73, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 5.73, 'USD', 1, 5.73, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 5.74, 'USD', 1, 5.74, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 4.30, 'USD', 1, 4.30, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 4.30, 'USD', 1, 4.30, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 8.60, 'USD', 1, 8.60, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared AWS $19.50 split 3 ways
+-- Expenses: Smash Vision - Shared AWS $19.50 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 6.50, 'USD', 1, 6.50, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 6.50, 'USD', 1, 6.50, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 6.50, 'USD', 1, 6.50, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 4.88, 'USD', 1, 4.88, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 4.88, 'USD', 1, 4.88, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 9.74, 'USD', 1, 9.74, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Cloudflare $32 split 3 ways
+-- Expenses: Smash Vision - Shared Cloudflare $32 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 10.67, 'USD', 1, 10.67, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 10.67, 'USD', 1, 10.67, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 10.66, 'USD', 1, 10.66, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 8.00, 'USD', 1, 8.00, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 8.00, 'USD', 1, 8.00, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 16.00, 'USD', 1, 16.00, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Extensión CF $24.64 split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $24.64 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 8.21, 'USD', 1, 8.21, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 8.21, 'USD', 1, 8.21, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 8.22, 'USD', 1, 8.22, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 6.16, 'USD', 1, 6.16, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 6.16, 'USD', 1, 6.16, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 12.32, 'USD', 1, 12.32, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Extensión CF $3 split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $3 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 1.00, 'USD', 1, 1.00, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 1.00, 'USD', 1, 1.00, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 1.00, 'USD', 1, 1.00, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 0.75, 'USD', 1, 0.75, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 0.75, 'USD', 1, 0.75, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 1.50, 'USD', 1, 1.50, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Extensión CF $5 split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $5 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-02-01', 'expense', 1.67, 'USD', 1, 1.67, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 1.67, 'USD', 1, 1.67, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-02-01', 'expense', 1.66, 'USD', 1, 1.66, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-02-01', 'expense', 1.25, 'USD', 1, 1.25, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 1.25, 'USD', 1, 1.25, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-02-01', 'expense', 2.50, 'USD', 1, 2.50, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
 -- Income: Febrero 2026
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
@@ -108,47 +108,47 @@ VALUES
 ('2026-03-01', 'expense', 32.50, 'USD', 1, 32.50, 'Afiches Prime Padel', NULL, (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Marketing' AND type = 'expense')),
 ('2026-03-01', 'expense', 4.00, 'USD', 1, 4.00, 'Corte de acrílico para Prime Padel', NULL, (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Materials' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Extensión CF $1.43 (first) split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $1.43 (first) split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-03-01', 'expense', 0.48, 'USD', 1, 0.48, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 0.48, 'USD', 1, 0.48, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 0.47, 'USD', 1, 0.47, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
-
--- Expenses: Smash Vision - Shared Extensión CF $1.43 (second) split 3 ways
-INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES
-('2026-03-01', 'expense', 0.48, 'USD', 1, 0.48, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 0.48, 'USD', 1, 0.48, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 0.47, 'USD', 1, 0.47, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
-
--- Expenses: Smash Vision - Shared AWS $17.80 split 3 ways
-INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES
-('2026-03-01', 'expense', 5.93, 'USD', 1, 5.93, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 5.93, 'USD', 1, 5.93, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 5.94, 'USD', 1, 5.94, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
-
--- Expenses: Smash Vision - Shared Extensión CF $2.13 split 3 ways
-INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES
-('2026-03-01', 'expense', 0.71, 'USD', 1, 0.71, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 0.71, 'USD', 1, 0.71, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 0.36, 'USD', 1, 0.36, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 0.36, 'USD', 1, 0.36, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
 ('2026-03-01', 'expense', 0.71, 'USD', 1, 0.71, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Claude $10 split 3 ways
+-- Expenses: Smash Vision - Shared Extensión CF $1.43 (second) split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-03-01', 'expense', 3.33, 'USD', 1, 3.33, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
-('2026-03-01', 'expense', 3.33, 'USD', 1, 3.33, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
-('2026-03-01', 'expense', 3.34, 'USD', 1, 3.34, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense'));
+('2026-03-01', 'expense', 0.36, 'USD', 1, 0.36, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 0.36, 'USD', 1, 0.36, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 0.71, 'USD', 1, 0.71, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
--- Expenses: Smash Vision - Shared Cloudflare $142 split 3 ways
+-- Expenses: Smash Vision - Shared AWS $17.80 split by cameras 2:2:4
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
 VALUES
-('2026-03-01', 'expense', 47.33, 'USD', 1, 47.33, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 47.33, 'USD', 1, 47.33, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
-('2026-03-01', 'expense', 47.34, 'USD', 1, 47.34, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+('2026-03-01', 'expense', 4.45, 'USD', 1, 4.45, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 4.45, 'USD', 1, 4.45, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 8.90, 'USD', 1, 8.90, 'Servicios de AWS', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+
+-- Expenses: Smash Vision - Shared Extensión CF $2.13 split by cameras 2:2:4
+INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
+VALUES
+('2026-03-01', 'expense', 0.53, 'USD', 1, 0.53, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 0.53, 'USD', 1, 0.53, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 1.07, 'USD', 1, 1.07, 'Extensión de nube Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
+
+-- Expenses: Smash Vision - Shared Claude $10 split by cameras 2:2:4
+INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
+VALUES
+('2026-03-01', 'expense', 2.50, 'USD', 1, 2.50, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
+('2026-03-01', 'expense', 2.50, 'USD', 1, 2.50, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense')),
+('2026-03-01', 'expense', 5.00, 'USD', 1, 5.00, 'Compra de Claude', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Software' AND type = 'expense'));
+
+-- Expenses: Smash Vision - Shared Cloudflare $142 split by cameras 2:2:4
+INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
+VALUES
+('2026-03-01', 'expense', 35.50, 'USD', 1, 35.50, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Prime Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 35.50, 'USD', 1, 35.50, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense')),
+('2026-03-01', 'expense', 71.00, 'USD', 1, 71.00, 'Cloudflare', 'Gasto compartido Prime Padel / Smash Padel / Padeling', (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'), (SELECT id FROM finance.people WHERE name = 'Smash Vision'), (SELECT id FROM finance.categories WHERE name = 'Services' AND type = 'expense'));
 
 -- Income: Marzo 2026
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)

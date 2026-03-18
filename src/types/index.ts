@@ -4,6 +4,7 @@ export interface Club {
   country: string | null;
   city: string | null;
   status: 'active' | 'inactive';
+  number_cameras: number;
   created_at: string;
 }
 
@@ -54,6 +55,7 @@ export interface TransactionFormData {
   description: string;
   notes: string;
   club_id: string;
+  club_ids: string[];
   person_id: string;
   category_id: string;
 }

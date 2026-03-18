@@ -5,8 +5,8 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 ## Features
 
 - **Dashboard**: Cash balance card (all-time, unaffected by filters), KPI cards (income, expenses, net profit, withdrawals), monthly income vs expense bar chart, net profit trend line, income by club donut chart, expenses by category donut chart, and recent transactions table. Includes a comprehensive filter bar with year quick-select buttons (All Time, 2026, 2025, 2024), transaction type, club, category, person, and custom date range filters. All charts and KPIs update dynamically based on the active filters
-- **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination
-- **Clubs**: Financial summary cards per club showing income, expenses, net profit, and transaction count
+- **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination. **Multi-club split**: when creating a transaction, select multiple clubs to automatically split the amount proportionally by each club's number of installed cameras
+- **Clubs**: Financial summary cards per club showing income, expenses, net profit, and transaction count. Each club has a `number_cameras` field used to calculate proportional expense splits
 - **People**: Team members and investors overview with expenses, reimbursements, withdrawals, gap contributions, and owed balance
 - **Multi-currency**: Records can be stored in USD, MXN, or COP with exchange rate tracking. Historical records preserved in USD
 
@@ -38,10 +38,14 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 
 The system uses a dedicated `finance` schema in PostgreSQL (separate from the `public` schema used by the recordingSystem):
 
-- **`finance.clubs`**: Padel clubs (Padel Nation, Smash Padel, Padeling Pance, Prime Padel)
+- **`finance.clubs`**: Padel clubs with `number_cameras` field (Padel Nation: 2, Smash Padel: 2, Padeling Pance: 4, Prime Padel: 2)
 - **`finance.people`**: Team members and investors
 - **`finance.categories`**: Expense and income categories
 - **`finance.transactions`**: All financial records with multi-currency support
+
+### Proportional Expense Splitting
+
+When an expense applies to multiple clubs, it is split proportionally based on each club's `number_cameras` relative to the total cameras of the participating clubs. For example, a $48 expense shared between Smash Padel (2 cameras) and Padeling Pance (4 cameras) results in $16 for Smash Padel and $32 for Padeling Pance. Each split creates a separate transaction row tied to its respective club, with a note indicating the shared expense. Rounding remainders are assigned to the last club to preserve exact totals.
 
 ### Transaction Types
 
@@ -147,7 +151,7 @@ src/
 
 ## Historical Data
 
-All financial records from 2024-2026 have been migrated from Excel spreadsheets into the database. Records without exact dates use the 1st of the month. All historical amounts are stored in USD.
+All financial records from 2024-2026 have been migrated from Excel spreadsheets into the database. Records without exact dates use the 1st of the month. All historical amounts are stored in USD. Shared expenses are split proportionally by camera count (not equally).
 
 ---
 

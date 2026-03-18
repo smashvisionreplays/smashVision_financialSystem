@@ -228,38 +228,38 @@ VALUES ('2024-10-01', 'expense', 38.00, 'USD', 1, 38.00, 'Chequeo de cámaras', 
   (SELECT id FROM finance.people WHERE name = 'César Castaño'),
   (SELECT id FROM finance.categories WHERE name = 'Infrastructure' AND type = 'expense'));
 
--- Envío de cámaras $110 split 50/50: Smash Padel + Padeling Pance
+-- Envío de cámaras $110 split by cameras 2:4 (Smash Padel + Padeling Pance)
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES ('2024-10-01', 'expense', 55.00, 'USD', 1, 55.00, 'Envío de cámaras', 'Gasto compartido Smash Padel / Padeling',
+VALUES ('2024-10-01', 'expense', 36.67, 'USD', 1, 36.67, 'Envío de cámaras', 'Gasto compartido Smash Padel / Padeling',
   (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'),
   (SELECT id FROM finance.people WHERE name = 'César Castaño'),
   (SELECT id FROM finance.categories WHERE name = 'Shipping' AND type = 'expense'));
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES ('2024-10-01', 'expense', 55.00, 'USD', 1, 55.00, 'Envío de cámaras', 'Gasto compartido Smash Padel / Padeling',
+VALUES ('2024-10-01', 'expense', 73.33, 'USD', 1, 73.33, 'Envío de cámaras', 'Gasto compartido Smash Padel / Padeling',
   (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'),
   (SELECT id FROM finance.people WHERE name = 'César Castaño'),
   (SELECT id FROM finance.categories WHERE name = 'Shipping' AND type = 'expense'));
 
--- Aduana cámaras $50 split 50/50: Smash Padel + Padeling Pance
+-- Aduana cámaras $50 split by cameras 2:4 (Smash Padel + Padeling Pance)
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES ('2024-10-01', 'expense', 25.00, 'USD', 1, 25.00, 'Aduana cámaras', 'Gasto compartido Smash Padel / Padeling',
+VALUES ('2024-10-01', 'expense', 16.67, 'USD', 1, 16.67, 'Aduana cámaras', 'Gasto compartido Smash Padel / Padeling',
   (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'),
   (SELECT id FROM finance.people WHERE name = 'César Castaño'),
   (SELECT id FROM finance.categories WHERE name = 'Shipping' AND type = 'expense'));
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES ('2024-10-01', 'expense', 25.00, 'USD', 1, 25.00, 'Aduana cámaras', 'Gasto compartido Smash Padel / Padeling',
+VALUES ('2024-10-01', 'expense', 33.33, 'USD', 1, 33.33, 'Aduana cámaras', 'Gasto compartido Smash Padel / Padeling',
   (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'),
   (SELECT id FROM finance.people WHERE name = 'César Castaño'),
   (SELECT id FROM finance.categories WHERE name = 'Shipping' AND type = 'expense'));
 
--- 4 Cámaras $188 split 50/50: Smash Padel + Padeling Pance
+-- 4 Cámaras $188 split by cameras 2:4 (Smash Padel + Padeling Pance)
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES ('2024-10-01', 'expense', 94.00, 'USD', 1, 94.00, '4 Cámaras', 'Gasto compartido Smash Padel / Padeling',
+VALUES ('2024-10-01', 'expense', 62.67, 'USD', 1, 62.67, '4 Cámaras', 'Gasto compartido Smash Padel / Padeling',
   (SELECT id FROM finance.clubs WHERE name = 'Smash Padel'),
   (SELECT id FROM finance.people WHERE name = 'Tomás Ossa'),
   (SELECT id FROM finance.categories WHERE name = 'Infrastructure' AND type = 'expense'));
 INSERT INTO finance.transactions (date, type, original_amount, original_currency, exchange_rate, usd_amount, description, notes, club_id, person_id, category_id)
-VALUES ('2024-10-01', 'expense', 94.00, 'USD', 1, 94.00, '4 Cámaras', 'Gasto compartido Smash Padel / Padeling',
+VALUES ('2024-10-01', 'expense', 125.33, 'USD', 1, 125.33, '4 Cámaras', 'Gasto compartido Smash Padel / Padeling',
   (SELECT id FROM finance.clubs WHERE name = 'Padeling Pance'),
   (SELECT id FROM finance.people WHERE name = 'Tomás Ossa'),
   (SELECT id FROM finance.categories WHERE name = 'Infrastructure' AND type = 'expense'));

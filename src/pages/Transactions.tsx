@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTransactions, useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../hooks/useTransactions';
+import { useClubs } from '../hooks/useClubs';
 import TransactionFiltersComponent from '../components/transactions/TransactionFilters';
 import TransactionTable from '../components/transactions/TransactionTable';
 import TransactionModal from '../components/transactions/TransactionModal';
@@ -24,6 +25,7 @@ export default function Transactions() {
   const [deleting, setDeleting] = useState<Transaction | null>(null);
 
   const { data: transactions, isLoading } = useTransactions(filters);
+  const { data: clubs } = useClubs();
   const createMutation = useCreateTransaction();
   const updateMutation = useUpdateTransaction();
   const deleteMutation = useDeleteTransaction();
@@ -44,8 +46,9 @@ export default function Transactions() {
         await updateMutation.mutateAsync({ id: editing.id, data });
         toast.success('Transaction updated');
       } else {
-        await createMutation.mutateAsync(data);
-        toast.success('Transaction created');
+        await createMutation.mutateAsync({ data, clubs: clubs || [] });
+        const count = data.club_ids.filter(Boolean).length;
+        toast.success(count > 1 ? `${count} transactions created (split by cameras)` : 'Transaction created');
       }
       setModalOpen(false);
       setEditing(null);
