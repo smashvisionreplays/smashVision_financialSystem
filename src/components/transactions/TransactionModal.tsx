@@ -24,6 +24,7 @@ const emptyForm: TransactionFormData = {
   notes: '',
   club_id: '',
   club_ids: [],
+  club_percentages: {},
   person_id: '',
   category_id: '',
 };
@@ -49,6 +50,7 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
         notes: transaction.notes || '',
         club_id: transaction.club_id || '',
         club_ids: transaction.club_id ? [transaction.club_id] : [],
+        club_percentages: {},
         person_id: transaction.person_id || '',
         category_id: transaction.category_id || '',
       });
@@ -72,17 +74,42 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
     setForm((f) => ({ ...f, [key]: value }));
   };
 
+  const computeDefaultPercentages = (clubIds: string[]) => {
+    const selected = clubs?.filter((c) => clubIds.includes(c.id)) || [];
+    const totalCams = selected.reduce((sum, c) => sum + c.number_cameras, 0);
+    if (totalCams === 0) return {};
+    const pcts: Record<string, number> = {};
+    selected.forEach((c) => {
+      pcts[c.id] = Number(((c.number_cameras / totalCams) * 100).toFixed(2));
+    });
+    return pcts;
+  };
+
   const toggleClub = (clubId: string) => {
     setForm((f) => {
       const ids = f.club_ids.includes(clubId)
         ? f.club_ids.filter((id) => id !== clubId)
         : [...f.club_ids, clubId];
-      return { ...f, club_ids: ids, club_id: ids[0] || '' };
+      return { ...f, club_ids: ids, club_id: ids[0] || '', club_percentages: computeDefaultPercentages(ids) };
     });
   };
 
+  const updatePercentage = (clubId: string, value: number) => {
+    setForm((f) => ({
+      ...f,
+      club_percentages: { ...f.club_percentages, [clubId]: value },
+    }));
+  };
+
+  const percentagesValid = (() => {
+    if (isEditing || form.club_ids.length <= 1) return true;
+    const total = Object.values(form.club_percentages).reduce((s, v) => s + v, 0);
+    return Math.abs(total - 100) <= 0.1;
+  })();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!percentagesValid) return;
     onSubmit(form);
   };
 
@@ -265,32 +292,53 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
               )}
             </div>
 
-            {/* Proportional split preview */}
-            {!isEditing && selectedClubs.length > 1 && form.usd_amount > 0 && (
+            {/* Proportional split with editable percentages */}
+            {!isEditing && selectedClubs.length > 1 && (
               <div className="sm:col-span-2 bg-sv-black/50 border border-sv-gray rounded-lg p-3">
                 <p className="text-sv-gray-text text-xs mb-2 font-medium">
-                  Proportional split by cameras ({totalCameras} total cameras):
+                  Split percentages ({totalCameras} total cameras — defaults based on camera count):
                 </p>
-                <div className="space-y-1">
-                  {selectedClubs.map((club, i) => {
-                    const isLast = i === selectedClubs.length - 1;
-                    const share = isLast
-                      ? Number((form.usd_amount - selectedClubs.slice(0, -1).reduce((s, c) => s + Number((form.usd_amount * c.number_cameras / totalCameras).toFixed(2)), 0)).toFixed(2))
-                      : Number((form.usd_amount * club.number_cameras / totalCameras).toFixed(2));
-                    const pct = ((club.number_cameras / totalCameras) * 100).toFixed(1);
+                <div className="space-y-2">
+                  {selectedClubs.map((club) => {
+                    const pct = form.club_percentages[club.id] ?? 0;
+                    const share = form.usd_amount > 0 ? Number((form.usd_amount * pct / 100).toFixed(2)) : 0;
                     return (
-                      <div key={club.id} className="flex justify-between text-sm">
-                        <span className="text-sv-white">
+                      <div key={club.id} className="flex items-center gap-3 text-sm">
+                        <span className="text-sv-white flex-1 min-w-0">
                           {club.name}{' '}
-                          <span className="text-sv-gray-text text-xs">
-                            ({club.number_cameras} cams · {pct}%)
-                          </span>
+                          <span className="text-sv-gray-text text-xs">({club.number_cameras} cams)</span>
                         </span>
-                        <span className="text-sv-lime font-medium">{formatCurrency(share)}</span>
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value={pct}
+                            onChange={(e) => updatePercentage(club.id, parseFloat(e.target.value) || 0)}
+                            className="w-20 bg-sv-gray border border-sv-gray-light rounded px-2 py-1 text-sm text-sv-white text-right focus:outline-none focus:border-sv-lime/50"
+                          />
+                          <span className="text-sv-gray-text text-xs">%</span>
+                        </div>
+                        {form.usd_amount > 0 && (
+                          <span className="text-sv-lime font-medium w-24 text-right">{formatCurrency(share)}</span>
+                        )}
                       </div>
                     );
                   })}
                 </div>
+                {(() => {
+                  const totalPct = Object.values(form.club_percentages).reduce((s, v) => s + v, 0);
+                  const diff = Math.abs(totalPct - 100);
+                  if (diff > 0.1) {
+                    return (
+                      <p className="text-red-400 text-xs mt-2">
+                        Total: {totalPct.toFixed(2)}% — must equal 100% (off by {diff.toFixed(2)}%)
+                      </p>
+                    );
+                  }
+                  return <p className="text-sv-lime/70 text-xs mt-2">Total: 100% ✓</p>;
+                })()}
               </div>
             )}
 
@@ -351,7 +399,12 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
             </button>
             <button
               type="submit"
-              className="px-6 py-2 rounded-lg bg-sv-lime text-sv-black font-semibold hover:bg-sv-lime-dark transition-colors text-sm"
+              disabled={!percentagesValid}
+              className={`px-6 py-2 rounded-lg font-semibold transition-colors text-sm ${
+                percentagesValid
+                  ? 'bg-sv-lime text-sv-black hover:bg-sv-lime-dark'
+                  : 'bg-sv-gray text-sv-gray-text cursor-not-allowed'
+              }`}
             >
               {isEditing ? 'Update' : selectedClubs.length > 1 ? `Create ${selectedClubs.length} Transactions` : 'Create'}
             </button>

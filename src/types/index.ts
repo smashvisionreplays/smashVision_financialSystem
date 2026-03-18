@@ -56,6 +56,7 @@ export interface TransactionFormData {
   notes: string;
   club_id: string;
   club_ids: string[];
+  club_percentages: Record<string, number>;
   person_id: string;
   category_id: string;
 }

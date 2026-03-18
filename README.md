@@ -5,7 +5,7 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 ## Features
 
 - **Dashboard**: Cash balance card (all-time, unaffected by filters), KPI cards (income, expenses, net profit, withdrawals), monthly income vs expense bar chart, net profit trend line, income by club donut chart, expenses by category donut chart, and recent transactions table. Includes a comprehensive filter bar with year quick-select buttons (All Time, 2026, 2025, 2024), transaction type, club, category, person, and custom date range filters. All charts and KPIs update dynamically based on the active filters
-- **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination. **Multi-club split**: when creating a transaction, select multiple clubs to automatically split the amount proportionally by each club's number of installed cameras
+- **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination. **Multi-club split**: when creating a transaction, select multiple clubs and assign a custom percentage to each club (defaults are calculated proportionally by camera count). The form validates that percentages sum to 100% before allowing submission
 - **Clubs**: Financial summary cards per club showing income, expenses, net profit, and transaction count. Each club has a `number_cameras` field used to calculate proportional expense splits
 - **People**: Team members and investors overview with expenses, reimbursements, withdrawals, gap contributions, and owed balance
 - **Multi-currency**: Records can be stored in USD, MXN, or COP with exchange rate tracking. Historical records preserved in USD
@@ -45,7 +45,7 @@ The system uses a dedicated `finance` schema in PostgreSQL (separate from the `p
 
 ### Proportional Expense Splitting
 
-When an expense applies to multiple clubs, it is split proportionally based on each club's `number_cameras` relative to the total cameras of the participating clubs. For example, a $48 expense shared between Smash Padel (2 cameras) and Padeling Pance (4 cameras) results in $16 for Smash Padel and $32 for Padeling Pance. Each split creates a separate transaction row tied to its respective club, with a note indicating the shared expense. Rounding remainders are assigned to the last club to preserve exact totals.
+When a transaction applies to multiple clubs, the user can assign a custom percentage to each club. The default percentages are calculated proportionally based on each club's `number_cameras` relative to the total cameras of the selected clubs (e.g., Smash Padel with 2 cameras and Padeling Pance with 4 cameras default to 33.33% and 66.67% respectively). Users can override these defaults with any values as long as they sum to 100%. Each split creates a separate transaction row tied to its respective club, with a note indicating the shared expense. Rounding remainders are assigned to the last club to preserve exact totals.
 
 ### Transaction Types
 

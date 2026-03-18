@@ -71,19 +71,18 @@ export function useCreateTransaction() {
         return result;
       }
 
-      // Multiple clubs — split proportionally by number_cameras
+      // Multiple clubs — split by custom percentages from form
       const selectedClubs = clubs.filter((c) => selectedClubIds.includes(c.id));
-      const totalCameras = selectedClubs.reduce((sum, c) => sum + c.number_cameras, 0);
 
       const rows = selectedClubs.map((club, i) => {
+        const pct = (data.club_percentages[club.id] ?? 0) / 100;
         const isLast = i === selectedClubs.length - 1;
-        const proportion = club.number_cameras / totalCameras;
         const clubUsd = isLast
-          ? Number((data.usd_amount - selectedClubs.slice(0, -1).reduce((s, c2) => s + Number((data.usd_amount * c2.number_cameras / totalCameras).toFixed(2)), 0)).toFixed(2))
-          : Number((data.usd_amount * proportion).toFixed(2));
+          ? Number((data.usd_amount - selectedClubs.slice(0, -1).reduce((s, c2) => s + Number((data.usd_amount * (data.club_percentages[c2.id] ?? 0) / 100).toFixed(2)), 0)).toFixed(2))
+          : Number((data.usd_amount * pct).toFixed(2));
         const clubOriginal = isLast
-          ? Number((data.original_amount - selectedClubs.slice(0, -1).reduce((s, c2) => s + Number((data.original_amount * c2.number_cameras / totalCameras).toFixed(2)), 0)).toFixed(2))
-          : Number((data.original_amount * proportion).toFixed(2));
+          ? Number((data.original_amount - selectedClubs.slice(0, -1).reduce((s, c2) => s + Number((data.original_amount * (data.club_percentages[c2.id] ?? 0) / 100).toFixed(2)), 0)).toFixed(2))
+          : Number((data.original_amount * pct).toFixed(2));
 
         const clubNames = selectedClubs.map((c) => c.name).join(' / ');
         const notePrefix = `Gasto compartido ${clubNames}`;
