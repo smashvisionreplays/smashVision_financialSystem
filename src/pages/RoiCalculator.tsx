@@ -192,6 +192,21 @@ export default function RoiCalculator() {
   const set = <K extends keyof RoiInputs>(key: K, value: RoiInputs[K]) =>
     setInputs((prev) => ({ ...prev, [key]: value }));
 
+  // ── Helpers for date math ─────────────────────────────────────────
+  function daysInMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+  }
+
+  function addMonths(date: Date, months: number): Date {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }
+
+  function formatMonth(date: Date): string {
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+  }
+
   // ── Calculations ──────────────────────────────────────────────────
   const calc = useMemo(() => {
     const n = inputs.numberOfCameras;
@@ -208,40 +223,135 @@ export default function RoiCalculator() {
     const totalMonthlyRevenue = inputs.monthlyRevenuePerCamera * n;
     const monthlyNetProfit = totalMonthlyRevenue - totalMonthlyCost;
 
-    // Contract months
     const contractMonths = Math.max(0, inputs.contractMonths);
+
+    // Build cashflow with real calendar days and proration
+    type CashflowRow = {
+      month: number;
+      label: string;
+      revenue: number;
+      cost: number;
+      cumulative: number;
+      isGrace: boolean;
+      fraction: number;
+    };
+    const cashflow: CashflowRow[] = [];
+    let totalRevenue = 0;
+    let totalOperatingCost = 0;
     let graceMonths = 0;
-    if (inputs.contractStartDate && inputs.billingStartDate) {
-      const start = new Date(inputs.contractStartDate + 'T00:00:00');
-      const billing = new Date(inputs.billingStartDate + 'T00:00:00');
-      graceMonths = Math.max(
-        0,
-        (billing.getFullYear() - start.getFullYear()) * 12 + (billing.getMonth() - start.getMonth()),
-      );
+    let billingMonths = 0;
+
+    if (inputs.contractStartDate && contractMonths > 0) {
+      const contractStart = new Date(inputs.contractStartDate + 'T00:00:00');
+      const contractEnd = addMonths(contractStart, contractMonths);
+      const billingStart = inputs.billingStartDate
+        ? new Date(inputs.billingStartDate + 'T00:00:00')
+        : contractStart;
+
+      // Iterate calendar months from contract start to contract end
+      let cursor = new Date(contractStart);
+      let cumulative = -netInitialInvestment;
+      let monthIndex = 0;
+
+      while (cursor < contractEnd) {
+        monthIndex++;
+        const year = cursor.getFullYear();
+        const month = cursor.getMonth();
+        const totalDays = daysInMonth(year, month);
+
+        // Contract fraction: how many days of this month fall within the contract
+        const monthStart = new Date(year, month, 1);
+        const monthEnd = new Date(year, month + 1, 0); // last day of month
+        const effectiveStart = contractStart > monthStart ? contractStart : monthStart;
+        const effectiveEnd = contractEnd < new Date(year, month + 1, 0, 23, 59, 59)
+          ? contractEnd : new Date(year, month + 1, 0, 23, 59, 59);
+        // Days in contract for this month (contractEnd day is exclusive — last day is the day before)
+        const contractDaysStart = effectiveStart.getDate();
+        // For end: if contractEnd falls in this month, it's the day of contractEnd (exclusive)
+        // Otherwise it's the full month
+        let contractDaysInMonth: number;
+        if (contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
+          contractDaysInMonth = contractEnd.getDate() - contractDaysStart;
+        } else if (contractStart.getFullYear() === year && contractStart.getMonth() === month) {
+          contractDaysInMonth = totalDays - contractDaysStart + 1;
+        } else {
+          contractDaysInMonth = totalDays;
+        }
+        // Handle first+last same month
+        if (contractStart.getFullYear() === year && contractStart.getMonth() === month &&
+            contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
+          contractDaysInMonth = contractEnd.getDate() - contractStart.getDate();
+        }
+        const contractFraction = Math.max(0, Math.min(1, contractDaysInMonth / totalDays));
+
+        // Billing fraction: how many days of this month fall within the billing period
+        let billingDaysInMonth = 0;
+        if (billingStart <= monthEnd && contractEnd > monthStart) {
+          const billEffStart = billingStart > monthStart ? billingStart : monthStart;
+          const billEffEnd = contractEnd < new Date(year, month + 1, 0, 23, 59, 59)
+            ? contractEnd : new Date(year, month + 1, 0, 23, 59, 59);
+
+          if (billEffStart <= billEffEnd) {
+            const bStartDay = billEffStart.getDate();
+            // End day calculation
+            if (contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
+              billingDaysInMonth = contractEnd.getDate() - bStartDay;
+            } else {
+              billingDaysInMonth = totalDays - bStartDay + 1;
+            }
+            // Clamp: if billing starts after contract end in this month
+            if (billingStart >= contractEnd) billingDaysInMonth = 0;
+            // Same month start+end for billing
+            if (billingStart.getFullYear() === year && billingStart.getMonth() === month &&
+                contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
+              billingDaysInMonth = contractEnd.getDate() - billingStart.getDate();
+            }
+          }
+        }
+        const billingFraction = Math.max(0, Math.min(1, billingDaysInMonth / totalDays));
+
+        const isGrace = billingFraction === 0;
+        const revenue = totalMonthlyRevenue * billingFraction;
+        const cost = totalMonthlyCost * contractFraction;
+        cumulative += revenue - cost;
+
+        totalRevenue += revenue;
+        totalOperatingCost += cost;
+        if (isGrace) graceMonths++;
+        if (billingFraction > 0) billingMonths++;
+
+        cashflow.push({
+          month: monthIndex,
+          label: formatMonth(new Date(year, month, 1)),
+          revenue,
+          cost,
+          cumulative,
+          isGrace,
+          fraction: billingFraction,
+        });
+
+        // Move to next month
+        cursor = new Date(year, month + 1, 1);
+      }
     }
-    const billingMonths = Math.max(0, contractMonths - graceMonths);
 
-    // ROI in months — how many billing months needed to recover net investment
-    // During grace months we pay costs but earn no revenue
-    const gracePeriodCost = totalMonthlyCost * graceMonths;
-    const totalToRecover = netInitialInvestment + gracePeriodCost;
-    const roiMonths = monthlyNetProfit > 0 ? totalToRecover / monthlyNetProfit : Infinity;
-    const roiFromContractStart = roiMonths + graceMonths;
-
-    // Total contract profit
-    const totalRevenue = totalMonthlyRevenue * billingMonths;
-    const totalOperatingCost = totalMonthlyCost * contractMonths;
     const totalContractProfit = totalRevenue - totalOperatingCost - netInitialInvestment;
 
-    // Monthly cashflow table
-    const cashflow: { month: number; label: string; revenue: number; cost: number; cumulative: number }[] = [];
-    let cumulative = -netInitialInvestment;
-    for (let m = 1; m <= contractMonths; m++) {
-      const isBilling = m > graceMonths;
-      const revenue = isBilling ? totalMonthlyRevenue : 0;
-      const cost = totalMonthlyCost;
-      cumulative += revenue - cost;
-      cashflow.push({ month: m, label: `Month ${m}`, revenue, cost, cumulative });
+    // ROI: find the month where cumulative crosses zero
+    let roiFromContractStart = Infinity;
+    let roiMonths = Infinity;
+    for (let i = 0; i < cashflow.length; i++) {
+      if (cashflow[i].cumulative >= 0) {
+        // Interpolate within this month
+        const prev = i > 0 ? cashflow[i - 1].cumulative : -netInitialInvestment;
+        const delta = cashflow[i].cumulative - prev;
+        const fractionInMonth = delta !== 0 ? (-prev) / delta : 0;
+        roiFromContractStart = i + fractionInMonth;
+        // Count billing months only
+        const graceCount = cashflow.slice(0, i).filter((r) => r.isGrace).length;
+        roiMonths = roiFromContractStart - graceCount;
+        break;
+      }
     }
 
     return {
@@ -526,7 +636,7 @@ export default function RoiCalculator() {
           value={calc.roiFromContractStart === Infinity ? 'N/A' : `${calc.roiFromContractStart.toFixed(1)} mo`}
           accent="text-amber-400"
         />
-        <KpiCard icon={Calendar} label="Contract" value={`${calc.contractMonths} mo`} sub={`${calc.graceMonths} grace`} />
+        <KpiCard icon={Calendar} label="Contract" value={`${calc.contractMonths} mo`} sub={`${calc.graceMonths} grace, ${calc.billingMonths} billing`} />
         <KpiCard
           icon={DollarSign}
           label="Contract Profit"
@@ -743,8 +853,11 @@ export default function RoiCalculator() {
                       >
                         <td className="py-1.5 px-2 text-sv-white">
                           {cf.label}
-                          {cf.month <= calc.graceMonths && (
+                          {cf.isGrace && (
                             <span className="ml-1 text-xs text-amber-400">(grace)</span>
+                          )}
+                          {cf.fraction > 0 && cf.fraction < 1 && (
+                            <span className="ml-1 text-xs text-blue-400">({Math.round(cf.fraction * 100)}%)</span>
                           )}
                         </td>
                         <td className="py-1.5 px-2 text-right text-sv-lime">{fmt(cf.revenue)}</td>
