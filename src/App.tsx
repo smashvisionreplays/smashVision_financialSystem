@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Clubs from './pages/Clubs';
 import People from './pages/People';
+import RoiCalculator from './pages/RoiCalculator';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="transactions" element={<Transactions />} />
             <Route path="clubs" element={<Clubs />} />
             <Route path="people" element={<People />} />
+            <Route path="roi" element={<RoiCalculator />} />
           </Route>
         </Routes>
       </BrowserRouter>

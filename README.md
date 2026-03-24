@@ -8,6 +8,7 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 - **Transactions**: Full CRUD operations (create, read, update, delete) with filters by type, club, person, category, date range, and description search. Sortable columns and pagination. **Multi-club split**: when creating a transaction, select multiple clubs and assign a custom percentage to each club (defaults are calculated proportionally by camera count). The form validates that percentages sum to 100% before allowing submission
 - **Clubs**: Financial summary cards per club showing income, expenses, net profit, and transaction count. Each club has a `number_cameras` field used to calculate proportional expense splits
 - **People**: Team members and investors overview with expenses, reimbursements, withdrawals, gap contributions, and owed balance
+- **ROI Calculator**: Standalone tool to estimate return on investment for potential new clubs. Inputs include camera count, hardware costs (cameras, switch, PC), itemized installation costs, contract dates with grace period support, monthly costs per camera (Cloudflare, AWS, etc.), monthly revenue per camera, and initial club contributions. Shows KPI summary cards, monthly cashflow projection table, and exports a professional PDF report with the Smash Vision logo
 - **Multi-currency**: Records can be stored in USD, MXN, or COP with exchange rate tracking. Historical records preserved in USD
 
 ## Tech Stack
@@ -22,6 +23,7 @@ Internal financial dashboard for **Smash Vision**, a company that installs camer
 | State | TanStack Query (React Query) |
 | Icons | Lucide React |
 | Notifications | React Hot Toast |
+| PDF Export | jsPDF + jspdf-autotable |
 | Routing | React Router v6 |
 
 ## Brand Colors
@@ -143,7 +145,7 @@ src/
 │   └── ui/              # Reusable UI (ConfirmDialog)
 ├── hooks/               # React Query hooks for Supabase
 ├── lib/                 # Supabase client, formatters
-├── pages/               # Dashboard, Transactions, Clubs, People
+├── pages/               # Dashboard, Transactions, Clubs, People, ROI Calculator
 ├── types/               # TypeScript interfaces
 ├── App.tsx              # Router and providers
 └── main.tsx             # Entry point

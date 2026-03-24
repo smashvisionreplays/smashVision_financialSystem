@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ArrowLeftRight, Building2, Users, Menu, X } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Building2, Users, Menu, X, Calculator } from 'lucide-react';
 import { useState } from 'react';
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/clubs', icon: Building2, label: 'Clubs' },
   { to: '/people', icon: Users, label: 'People' },
+  { to: '/roi', icon: Calculator, label: 'ROI Calculator' },
 ];
 
 export default function Sidebar() {
@@ -38,9 +39,7 @@ export default function Sidebar() {
       >
         <div className="p-6 border-b border-sv-gray">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-sv-lime rounded-lg flex items-center justify-center">
-              <span className="text-sv-black font-bold text-sm">SV</span>
-            </div>
+            <img src="/logo.png" alt="Smash Vision" className="w-9 h-9 rounded-lg" />
             <div>
               <h1 className="text-sv-white font-bold text-lg leading-tight">Smash Vision</h1>
               <p className="text-sv-gray-text text-xs">Financial System</p>
