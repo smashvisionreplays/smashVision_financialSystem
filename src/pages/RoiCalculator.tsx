@@ -31,7 +31,7 @@ interface RoiInputs {
   installationItems: CostItem[];
   contractStartDate: string;
   billingStartDate: string;
-  contractEndDate: string;
+  contractMonths: number;
   monthlyCostItems: CostItem[];
   monthlyRevenuePerCamera: number;
   initialContributions: CostItem[];
@@ -46,7 +46,7 @@ const defaultInputs: RoiInputs = {
   installationItems: [],
   contractStartDate: '',
   billingStartDate: '',
-  contractEndDate: '',
+  contractMonths: 0,
   monthlyCostItems: [],
   monthlyRevenuePerCamera: 0,
   initialContributions: [],
@@ -209,17 +209,8 @@ export default function RoiCalculator() {
     const monthlyNetProfit = totalMonthlyRevenue - totalMonthlyCost;
 
     // Contract months
-    let contractMonths = 0;
+    const contractMonths = Math.max(0, inputs.contractMonths);
     let graceMonths = 0;
-    let billingMonths = 0;
-    if (inputs.contractStartDate && inputs.contractEndDate) {
-      const start = new Date(inputs.contractStartDate + 'T00:00:00');
-      const end = new Date(inputs.contractEndDate + 'T00:00:00');
-      contractMonths = Math.max(
-        0,
-        (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()),
-      );
-    }
     if (inputs.contractStartDate && inputs.billingStartDate) {
       const start = new Date(inputs.contractStartDate + 'T00:00:00');
       const billing = new Date(inputs.billingStartDate + 'T00:00:00');
@@ -228,14 +219,7 @@ export default function RoiCalculator() {
         (billing.getFullYear() - start.getFullYear()) * 12 + (billing.getMonth() - start.getMonth()),
       );
     }
-    if (inputs.billingStartDate && inputs.contractEndDate) {
-      const billing = new Date(inputs.billingStartDate + 'T00:00:00');
-      const end = new Date(inputs.contractEndDate + 'T00:00:00');
-      billingMonths = Math.max(
-        0,
-        (end.getFullYear() - billing.getFullYear()) * 12 + (end.getMonth() - billing.getMonth()),
-      );
-    }
+    const billingMonths = Math.max(0, contractMonths - graceMonths);
 
     // ROI in months — how many billing months needed to recover net investment
     // During grace months we pay costs but earn no revenue
@@ -341,7 +325,7 @@ export default function RoiCalculator() {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.text(
-      `${inputs.numberOfCameras} cameras  |  Contract: ${inputs.contractStartDate || '—'} to ${inputs.contractEndDate || '—'}  |  Billing starts: ${inputs.billingStartDate || '—'}`,
+      `${inputs.numberOfCameras} cameras  |  ${inputs.contractMonths} months contract  |  Start: ${inputs.contractStartDate || '—'}  |  Billing starts: ${inputs.billingStartDate || '—'}`,
       margin,
       y + 4,
     );
@@ -679,12 +663,14 @@ export default function RoiCalculator() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-sv-gray-text mb-1">Contract End</label>
+                <label className="block text-sm font-medium text-sv-gray-text mb-1">Contract Months</label>
                 <input
-                  type="date"
-                  value={inputs.contractEndDate}
-                  onChange={(e) => set('contractEndDate', e.target.value)}
-                  className="w-full bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-2 text-sm text-sv-white"
+                  type="number"
+                  value={inputs.contractMonths || ''}
+                  onChange={(e) => set('contractMonths', parseInt(e.target.value) || 0)}
+                  placeholder="e.g. 24"
+                  min="0"
+                  className="w-full bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-2 text-sm text-sv-white placeholder-sv-gray-text"
                 />
               </div>
             </div>
