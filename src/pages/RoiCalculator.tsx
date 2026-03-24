@@ -193,10 +193,6 @@ export default function RoiCalculator() {
     setInputs((prev) => ({ ...prev, [key]: value }));
 
   // ── Helpers for date math ─────────────────────────────────────────
-  function daysInMonth(year: number, month: number): number {
-    return new Date(year, month + 1, 0).getDate();
-  }
-
   function addMonths(date: Date, months: number): Date {
     const d = new Date(date);
     d.setMonth(d.getMonth() + months);
@@ -257,58 +253,41 @@ export default function RoiCalculator() {
         monthIndex++;
         const year = cursor.getFullYear();
         const month = cursor.getMonth();
-        const totalDays = daysInMonth(year, month);
+        const DAYS_PER_MONTH = 30; // all months treated as 30 days for proration
 
         // Contract fraction: how many days of this month fall within the contract
         const monthStart = new Date(year, month, 1);
         const monthEnd = new Date(year, month + 1, 0); // last day of month
-        const effectiveStart = contractStart > monthStart ? contractStart : monthStart;
-        const effectiveEnd = contractEnd < new Date(year, month + 1, 0, 23, 59, 59)
-          ? contractEnd : new Date(year, month + 1, 0, 23, 59, 59);
-        // Days in contract for this month (contractEnd day is exclusive — last day is the day before)
-        const contractDaysStart = effectiveStart.getDate();
-        // For end: if contractEnd falls in this month, it's the day of contractEnd (exclusive)
-        // Otherwise it's the full month
+        const isFirstMonth = contractStart.getFullYear() === year && contractStart.getMonth() === month;
+        const isLastMonth = contractEnd.getFullYear() === year && contractEnd.getMonth() === month;
+
         let contractDaysInMonth: number;
-        if (contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
-          contractDaysInMonth = contractEnd.getDate() - contractDaysStart;
-        } else if (contractStart.getFullYear() === year && contractStart.getMonth() === month) {
-          contractDaysInMonth = totalDays - contractDaysStart + 1;
-        } else {
-          contractDaysInMonth = totalDays;
-        }
-        // Handle first+last same month
-        if (contractStart.getFullYear() === year && contractStart.getMonth() === month &&
-            contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
+        if (isFirstMonth && isLastMonth) {
           contractDaysInMonth = contractEnd.getDate() - contractStart.getDate();
+        } else if (isFirstMonth) {
+          contractDaysInMonth = DAYS_PER_MONTH - contractStart.getDate() + 1;
+        } else if (isLastMonth) {
+          contractDaysInMonth = contractEnd.getDate() - 1;
+        } else {
+          contractDaysInMonth = DAYS_PER_MONTH;
         }
-        const contractFraction = Math.max(0, Math.min(1, contractDaysInMonth / totalDays));
+        const contractFraction = Math.max(0, Math.min(1, contractDaysInMonth / DAYS_PER_MONTH));
 
         // Billing fraction: how many days of this month fall within the billing period
+        const isBillingFirstMonth = billingStart.getFullYear() === year && billingStart.getMonth() === month;
         let billingDaysInMonth = 0;
-        if (billingStart <= monthEnd && contractEnd > monthStart) {
-          const billEffStart = billingStart > monthStart ? billingStart : monthStart;
-          const billEffEnd = contractEnd < new Date(year, month + 1, 0, 23, 59, 59)
-            ? contractEnd : new Date(year, month + 1, 0, 23, 59, 59);
-
-          if (billEffStart <= billEffEnd) {
-            const bStartDay = billEffStart.getDate();
-            // End day calculation
-            if (contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
-              billingDaysInMonth = contractEnd.getDate() - bStartDay;
-            } else {
-              billingDaysInMonth = totalDays - bStartDay + 1;
-            }
-            // Clamp: if billing starts after contract end in this month
-            if (billingStart >= contractEnd) billingDaysInMonth = 0;
-            // Same month start+end for billing
-            if (billingStart.getFullYear() === year && billingStart.getMonth() === month &&
-                contractEnd.getFullYear() === year && contractEnd.getMonth() === month) {
-              billingDaysInMonth = contractEnd.getDate() - billingStart.getDate();
-            }
+        if (billingStart <= monthEnd && contractEnd > monthStart && billingStart < contractEnd) {
+          if (isBillingFirstMonth && isLastMonth) {
+            billingDaysInMonth = contractEnd.getDate() - billingStart.getDate();
+          } else if (isBillingFirstMonth) {
+            billingDaysInMonth = DAYS_PER_MONTH - billingStart.getDate() + 1;
+          } else if (isLastMonth && billingStart < monthStart) {
+            billingDaysInMonth = contractEnd.getDate() - 1;
+          } else if (billingStart < monthStart) {
+            billingDaysInMonth = DAYS_PER_MONTH;
           }
         }
-        const billingFraction = Math.max(0, Math.min(1, billingDaysInMonth / totalDays));
+        const billingFraction = Math.max(0, Math.min(1, billingDaysInMonth / DAYS_PER_MONTH));
 
         const isGrace = billingFraction === 0;
         const revenue = totalMonthlyRevenue * billingFraction;
