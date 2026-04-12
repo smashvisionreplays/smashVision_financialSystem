@@ -451,7 +451,7 @@ export default function RoiCalculator() {
       columnStyles: { 2: { halign: 'right' } },
       margin: { left: margin, right: margin },
     });
-    y = (doc as unknown as Record<string, number>).lastAutoTable.finalY + 8;
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
 
     // ── Section: Monthly Breakdown ──
     doc.setFontSize(11);
@@ -481,7 +481,7 @@ export default function RoiCalculator() {
       columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
       margin: { left: margin, right: margin },
     });
-    y = (doc as unknown as Record<string, number>).lastAutoTable.finalY + 8;
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
 
     // ── Section: ROI Summary ──
     doc.setFontSize(11);
@@ -513,7 +513,7 @@ export default function RoiCalculator() {
       columnStyles: { 1: { halign: 'right' } },
       margin: { left: margin, right: margin },
     });
-    y = (doc as unknown as Record<string, number>).lastAutoTable.finalY + 8;
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
 
     // ── Section: Monthly Cashflow ──
     if (calc.cashflow.length > 0) {
