@@ -151,6 +151,24 @@ src/
 └── main.tsx             # Entry point
 ```
 
+## Deployment (Vercel)
+
+This is a static Vite app — no backend needed. Deploy to Vercel in minutes:
+
+1. Go to [vercel.com](https://vercel.com) → **Add New Project** → import the GitHub repo `smashvisionreplays/smashVision_financialSystem`
+2. Vercel auto-detects Vite. Confirm settings:
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+3. Under **Environment Variables**, add:
+   ```
+   VITE_SUPABASE_URL      → your Supabase project URL
+   VITE_SUPABASE_ANON_KEY → your Supabase anon key
+   ```
+4. Click **Deploy**. Every push to `main` auto-deploys.
+
+> Supabase note: make sure the `finance` schema is listed under **Settings → API → Exposed schemas** in your Supabase project.
+
 ## Historical Data
 
 All financial records from 2024-2026 have been migrated from Excel spreadsheets into the database. Records without exact dates use the 1st of the month. All historical amounts are stored in USD. Shared expenses are split proportionally by camera count (not equally).

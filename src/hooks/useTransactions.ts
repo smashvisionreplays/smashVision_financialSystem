@@ -54,7 +54,7 @@ export function useCreateTransaction() {
 
       // Single club or no club — insert one row
       if (selectedClubIds.length <= 1) {
-        const { club_ids: _, ...rest } = data;
+        const { club_ids: _, club_percentages: __, ...rest } = data;
         const payload = {
           ...rest,
           club_id: selectedClubIds[0] || null,
@@ -121,7 +121,7 @@ export function useUpdateTransaction() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<TransactionFormData> }) => {
-      const { club_ids: _, ...rest } = data;
+      const { club_ids: _, club_percentages: __, ...rest } = data;
       const payload = {
         ...rest,
         club_id: data.club_id || null,
