@@ -47,7 +47,7 @@ export default function TrendChart({ transactions }: TrendChartProps) {
                 borderRadius: '8px',
                 color: '#fff',
               }}
-              formatter={(value: number) => [`$${value.toFixed(2)}`, undefined]}
+              formatter={(value) => [`$${Number(value).toFixed(2)}`, undefined]}
             />
             <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: 12 }} />
             <Line

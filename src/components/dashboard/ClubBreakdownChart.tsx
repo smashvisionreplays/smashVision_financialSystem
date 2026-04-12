@@ -56,7 +56,7 @@ export default function ClubBreakdownChart({ transactions }: ClubBreakdownChartP
                 borderRadius: '8px',
                 color: '#fff',
               }}
-              formatter={(value: number) => [`$${value.toFixed(2)}`, undefined]}
+              formatter={(value) => [`$${Number(value).toFixed(2)}`, undefined]}
             />
             <Legend
               wrapperStyle={{ fontSize: 12 }}

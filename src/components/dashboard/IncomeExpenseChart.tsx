@@ -48,7 +48,7 @@ export default function IncomeExpenseChart({ transactions }: IncomeExpenseChartP
                 borderRadius: '8px',
                 color: '#fff',
               }}
-              formatter={(value: number) => [`$${value.toFixed(2)}`, undefined]}
+              formatter={(value) => [`$${Number(value).toFixed(2)}`, undefined]}
             />
             <Legend wrapperStyle={{ color: '#9CA3AF', fontSize: 12 }} />
             <Bar dataKey="Income" fill="#AAFF00" radius={[4, 4, 0, 0]} />
