@@ -20,17 +20,8 @@ const queryClient = new QueryClient({
 });
 
 function ProtectedRoutes() {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-sv-black flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-sv-lime border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!session) return <Navigate to="/login" replace />;
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
     <Routes>
@@ -46,13 +37,19 @@ function ProtectedRoutes() {
   );
 }
 
+function LoginRoute() {
+  const { isAuthenticated } = useAuth();
+  if (isAuthenticated) return <Navigate to="/" replace />;
+  return <Login />;
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/login" element={<AuthRedirect />} />
+            <Route path="/login" element={<LoginRoute />} />
             <Route path="/*" element={<ProtectedRoutes />} />
           </Routes>
         </BrowserRouter>
@@ -72,12 +69,4 @@ export default function App() {
       </AuthProvider>
     </QueryClientProvider>
   );
-}
-
-// Redirects already-logged-in users away from /login
-function AuthRedirect() {
-  const { session, loading } = useAuth();
-  if (loading) return null;
-  if (session) return <Navigate to="/" replace />;
-  return <Login />;
 }

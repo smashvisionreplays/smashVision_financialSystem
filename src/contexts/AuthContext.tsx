@@ -1,42 +1,41 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import type { Session } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { createContext, useContext, useState } from 'react';
+
+const PASSWORD = 'SmashVisionTomasCesar2026*';
+const STORAGE_KEY = 'sv_auth';
 
 interface AuthContextValue {
-  session: Session | null;
-  loading: boolean;
-  signOut: () => Promise<void>;
+  isAuthenticated: boolean;
+  signIn: (password: string) => boolean;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue>({
-  session: null,
-  loading: true,
-  signOut: async () => {},
+  isAuthenticated: false,
+  signIn: () => false,
+  signOut: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => localStorage.getItem(STORAGE_KEY) === '1'
+  );
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
+  const signIn = (password: string) => {
+    if (password === PASSWORD) {
+      localStorage.setItem(STORAGE_KEY, '1');
+      setIsAuthenticated(true);
+      return true;
+    }
+    return false;
+  };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signOut = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ session, loading, signOut }}>
+    <AuthContext.Provider value={{ isAuthenticated, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
