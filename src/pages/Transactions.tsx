@@ -43,8 +43,16 @@ export default function Transactions() {
   const handleSubmit = async (data: TransactionFormData) => {
     try {
       if (editing) {
-        await updateMutation.mutateAsync({ id: editing.id, data });
-        toast.success('Transaction updated');
+        const selectedPersonIds = data.type === 'withdrawal' ? data.person_ids.filter(Boolean) : [];
+        if (selectedPersonIds.length > 1) {
+          // Delete original and create one row per person
+          await deleteMutation.mutateAsync(editing.id);
+          await createMutation.mutateAsync({ data, clubs: clubs || [] });
+          toast.success(`${selectedPersonIds.length} withdrawals saved`);
+        } else {
+          await updateMutation.mutateAsync({ id: editing.id, data });
+          toast.success('Transaction updated');
+        }
       } else {
         await createMutation.mutateAsync({ data, clubs: clubs || [] });
         const clubCount = data.club_ids.filter(Boolean).length;
