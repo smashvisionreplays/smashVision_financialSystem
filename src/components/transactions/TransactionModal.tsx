@@ -354,13 +354,15 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
             )}
 
             {/* Person — multi-select for withdrawal, single select otherwise */}
-            <div className={form.type === 'withdrawal' && !isEditing ? 'sm:col-span-2' : ''}>
+            <div className={form.type === 'withdrawal' ? 'sm:col-span-2' : ''}>
               <label className="block text-sv-gray-text text-sm mb-1">
-                {form.type === 'withdrawal' && !isEditing
-                  ? 'Person(s) — one transaction will be created per person'
+                {form.type === 'withdrawal'
+                  ? isEditing
+                    ? 'Person'
+                    : 'Person(s) — one transaction will be created per person'
                   : 'Person'}
               </label>
-              {form.type === 'withdrawal' && !isEditing ? (
+              {form.type === 'withdrawal' ? (
                 <div className="grid grid-cols-2 gap-2">
                   {people?.map((person) => {
                     const isSelected = form.person_ids.includes(person.id);
