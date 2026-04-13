@@ -26,6 +26,7 @@ const emptyForm: TransactionFormData = {
   club_ids: [],
   club_percentages: {},
   person_id: '',
+  person_ids: [],
   category_id: '',
 };
 
@@ -52,6 +53,7 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
         club_ids: transaction.club_id ? [transaction.club_id] : [],
         club_percentages: {},
         person_id: transaction.person_id || '',
+        person_ids: transaction.person_id ? [transaction.person_id] : [],
         category_id: transaction.category_id || '',
       });
     } else {
@@ -91,6 +93,15 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
         ? f.club_ids.filter((id) => id !== clubId)
         : [...f.club_ids, clubId];
       return { ...f, club_ids: ids, club_id: ids[0] || '', club_percentages: computeDefaultPercentages(ids) };
+    });
+  };
+
+  const togglePerson = (personId: string) => {
+    setForm((f) => {
+      const ids = f.person_ids.includes(personId)
+        ? f.person_ids.filter((id) => id !== personId)
+        : [...f.person_ids, personId];
+      return { ...f, person_ids: ids, person_id: ids[0] || '' };
     });
   };
 
@@ -342,21 +353,55 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
               </div>
             )}
 
-            {/* Person */}
-            <div>
-              <label className="block text-sv-gray-text text-sm mb-1">Person</label>
-              <select
-                value={form.person_id}
-                onChange={(e) => update('person_id', e.target.value)}
-                className="w-full bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-2 text-sm text-sv-white focus:outline-none focus:border-sv-lime/50"
-              >
-                <option value="">N/A</option>
-                {people?.map((person) => (
-                  <option key={person.id} value={person.id}>
-                    {person.name}
-                  </option>
-                ))}
-              </select>
+            {/* Person — multi-select for withdrawal, single select otherwise */}
+            <div className={form.type === 'withdrawal' && !isEditing ? 'sm:col-span-2' : ''}>
+              <label className="block text-sv-gray-text text-sm mb-1">
+                {form.type === 'withdrawal' && !isEditing
+                  ? 'Person(s) — one transaction will be created per person'
+                  : 'Person'}
+              </label>
+              {form.type === 'withdrawal' && !isEditing ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {people?.map((person) => {
+                    const isSelected = form.person_ids.includes(person.id);
+                    return (
+                      <button
+                        key={person.id}
+                        type="button"
+                        onClick={() => togglePerson(person.id)}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors text-left ${
+                          isSelected
+                            ? 'border-sv-lime bg-sv-lime/10 text-sv-lime'
+                            : 'border-sv-gray-light bg-sv-gray text-sv-white hover:border-sv-gray-text'
+                        }`}
+                      >
+                        <div
+                          className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${
+                            isSelected ? 'bg-sv-lime border-sv-lime' : 'border-sv-gray-text'
+                          }`}
+                        >
+                          {isSelected && <Check size={12} className="text-sv-black" />}
+                        </div>
+                        <span>{person.name}</span>
+                        <span className="text-sv-gray-text text-xs ml-auto capitalize">{person.role}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <select
+                  value={form.person_id}
+                  onChange={(e) => update('person_id', e.target.value)}
+                  className="w-full bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-2 text-sm text-sv-white focus:outline-none focus:border-sv-lime/50"
+                >
+                  <option value="">N/A</option>
+                  {people?.map((person) => (
+                    <option key={person.id} value={person.id}>
+                      {person.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* Category */}
@@ -406,7 +451,13 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
                   : 'bg-sv-gray text-sv-gray-text cursor-not-allowed'
               }`}
             >
-              {isEditing ? 'Update' : selectedClubs.length > 1 ? `Create ${selectedClubs.length} Transactions` : 'Create'}
+              {isEditing
+                ? 'Update'
+                : form.type === 'withdrawal' && form.person_ids.length > 1
+                  ? `Create ${form.person_ids.length} Withdrawals`
+                  : selectedClubs.length > 1
+                    ? `Create ${selectedClubs.length} Transactions`
+                    : 'Create'}
             </button>
           </div>
         </form>

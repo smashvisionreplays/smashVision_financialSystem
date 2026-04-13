@@ -51,14 +51,34 @@ export function useCreateTransaction() {
   return useMutation({
     mutationFn: async ({ data, clubs }: { data: TransactionFormData; clubs: Club[] }) => {
       const selectedClubIds = data.club_ids.filter(Boolean);
+      const selectedPersonIds = data.person_ids.filter(Boolean);
+
+      // Helper: build base payload without virtual fields
+      const { club_ids: _ci, club_percentages: _cp, person_ids: _pi, ...rest } = data;
+
+      // Withdrawal with multiple persons — one row per person, full amount each
+      if (data.type === 'withdrawal' && selectedPersonIds.length > 1) {
+        const rows = selectedPersonIds.map((personId) => ({
+          ...rest,
+          club_id: selectedClubIds[0] || null,
+          person_id: personId,
+          category_id: data.category_id || null,
+          notes: data.notes || null,
+        }));
+        const { data: result, error } = await supabase
+          .from('transactions')
+          .insert(rows)
+          .select();
+        if (error) throw error;
+        return result;
+      }
 
       // Single club or no club — insert one row
       if (selectedClubIds.length <= 1) {
-        const { club_ids: _, club_percentages: __, ...rest } = data;
         const payload = {
           ...rest,
           club_id: selectedClubIds[0] || null,
-          person_id: data.person_id || null,
+          person_id: selectedPersonIds[0] || data.person_id || null,
           category_id: data.category_id || null,
           notes: data.notes || null,
         };
@@ -121,7 +141,7 @@ export function useUpdateTransaction() {
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<TransactionFormData> }) => {
-      const { club_ids: _, club_percentages: __, ...rest } = data;
+      const { club_ids: _, club_percentages: __, person_ids: ___, ...rest } = data;
       const payload = {
         ...rest,
         club_id: data.club_id || null,

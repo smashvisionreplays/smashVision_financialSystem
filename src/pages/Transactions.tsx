@@ -47,8 +47,15 @@ export default function Transactions() {
         toast.success('Transaction updated');
       } else {
         await createMutation.mutateAsync({ data, clubs: clubs || [] });
-        const count = data.club_ids.filter(Boolean).length;
-        toast.success(count > 1 ? `${count} transactions created (split by cameras)` : 'Transaction created');
+        const clubCount = data.club_ids.filter(Boolean).length;
+        const personCount = data.type === 'withdrawal' ? data.person_ids.filter(Boolean).length : 0;
+        if (personCount > 1) {
+          toast.success(`${personCount} withdrawals created`);
+        } else if (clubCount > 1) {
+          toast.success(`${clubCount} transactions created (split by cameras)`);
+        } else {
+          toast.success('Transaction created');
+        }
       }
       setModalOpen(false);
       setEditing(null);

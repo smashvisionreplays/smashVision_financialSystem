@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ArrowLeftRight, Building2, Users, Menu, X, Calculator } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Building2, Users, Menu, X, Calculator, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -12,6 +13,7 @@ const navItems = [
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const { session, signOut } = useAuth();
 
   return (
     <>
@@ -52,6 +54,7 @@ export default function Sidebar() {
             <NavLink
               key={to}
               to={to}
+              end={to === '/'}
               onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm font-medium ${
@@ -67,10 +70,19 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-sv-gray">
-          <p className="text-sv-gray-text text-xs text-center">
-            Smash Vision &copy; {new Date().getFullYear()}
-          </p>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-sv-gray space-y-3">
+          {session?.user?.email && (
+            <p className="text-sv-gray-text text-xs truncate px-1" title={session.user.email}>
+              {session.user.email}
+            </p>
+          )}
+          <button
+            onClick={signOut}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sv-gray-text hover:text-red-400 hover:bg-sv-gray/50 transition-colors text-sm"
+          >
+            <LogOut size={16} />
+            Sign out
+          </button>
         </div>
       </aside>
     </>
