@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Calculator,
   Plus,
@@ -7,53 +7,48 @@ import {
   Check,
   X,
   Download,
+  Upload,
+  Eraser,
   Camera,
   DollarSign,
   Calendar,
   TrendingUp,
   Clock,
 } from 'lucide-react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ReferenceLine,
+  ResponsiveContainer,
+} from 'recharts';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
+import {
+  type CostItem,
+  type RoiInputs,
+  defaultRoiInputs,
+  genId,
+  exportRoiPdf,
+  parseRoiPdf,
+  sanitizeRoiInputs,
+} from '../lib/roiPdf';
 
-interface CostItem {
-  id: string;
-  name: string;
-  cost: number;
-}
+const STORAGE_KEY = 'sv-roi-calculator';
 
-interface RoiInputs {
-  clubName: string;
-  cameraCost: number;
-  numberOfCameras: number;
-  switchCost: number;
-  pcCost: number;
-  installationItems: CostItem[];
-  contractStartDate: string;
-  billingStartDate: string;
-  contractMonths: number;
-  monthlyCostItems: CostItem[];
-  monthlyRevenuePerCamera: number;
-  initialContributions: CostItem[];
-}
-
-const defaultInputs: RoiInputs = {
-  clubName: '',
-  cameraCost: 0,
-  numberOfCameras: 1,
-  switchCost: 0,
-  pcCost: 0,
-  installationItems: [],
-  contractStartDate: '',
-  billingStartDate: '',
-  contractMonths: 0,
-  monthlyCostItems: [],
-  monthlyRevenuePerCamera: 0,
-  initialContributions: [],
-};
-
-function genId() {
-  return Math.random().toString(36).slice(2, 9);
+function loadStoredInputs(): RoiInputs {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const stored = sanitizeRoiInputs(JSON.parse(raw));
+      if (stored) return stored;
+    }
+  } catch {
+    // corrupted storage — start fresh
+  }
+  return defaultRoiInputs;
 }
 
 // ── Editable list component ───────────────────────────────────────────
@@ -187,10 +182,60 @@ function EditableList({
 
 // ── Main page ─────────────────────────────────────────────────────────
 export default function RoiCalculator() {
-  const [inputs, setInputs] = useState<RoiInputs>(defaultInputs);
+  const [inputs, setInputs] = useState<RoiInputs>(loadStoredInputs);
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importNotice, setImportNotice] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Persist inputs so a refresh or navigation doesn't lose the calculation
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(inputs));
+    } catch {
+      // storage unavailable — non-critical
+    }
+  }, [inputs]);
 
   const set = <K extends keyof RoiInputs>(key: K, value: RoiInputs[K]) =>
     setInputs((prev) => ({ ...prev, [key]: value }));
+
+  const clearAll = () => {
+    setInputs(defaultRoiInputs);
+    setImportError(null);
+    setImportNotice(null);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setConfirmClear(false);
+  };
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setImportError(null);
+    setImportNotice(null);
+    try {
+      const parsed = parseRoiPdf(await file.arrayBuffer());
+      if (!parsed) {
+        setImportError(
+          'Could not read ROI data from this PDF. Make sure it is a ROI report exported from this system.',
+        );
+        return;
+      }
+      setInputs(parsed.inputs);
+      setImportNotice(
+        `Imported "${parsed.inputs.clubName || 'New Club'}"${
+          parsed.source === 'legacy' ? ' (older PDF format — please double-check the values)' : ''
+        }`,
+      );
+    } catch {
+      setImportError('Failed to read the file. Please try again with a valid PDF.');
+    }
+  };
 
   // ── Helpers for date math ─────────────────────────────────────────
   function addMonths(date: Date, months: number): Date {
@@ -355,214 +400,14 @@ export default function RoiCalculator() {
     };
   }, [inputs]);
 
-  // ── PDF export ────────────────────────────────────────────────────
-  const exportPDF = async () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-
-    // Load logo
-    let logoData: string | null = null;
-    try {
-      const response = await fetch('/logo.png');
-      const blob = await response.blob();
-      logoData = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
-      });
-    } catch {
-      // continue without logo
-    }
-
-    // Header
-    let y = 15;
-    if (logoData) {
-      doc.addImage(logoData, 'PNG', margin, y, 18, 18);
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Smash Vision', margin + 22, y + 8);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Financial System — ROI Report', margin + 22, y + 14);
-    } else {
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Smash Vision', margin, y + 8);
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Financial System — ROI Report', margin, y + 14);
-    }
-
-    // Date
-    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    doc.setFontSize(9);
-    doc.text(today, pageWidth - margin, y + 8, { align: 'right' });
-
-    // Line
-    y += 22;
-    doc.setDrawColor(170, 255, 0);
-    doc.setLineWidth(0.5);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 8;
-
-    // Club name
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(inputs.clubName || 'New Club', margin, y);
-    y += 4;
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(
-      `${inputs.numberOfCameras} cameras  |  ${inputs.contractMonths} months contract  |  Start: ${inputs.contractStartDate || '—'}  |  Billing starts: ${inputs.billingStartDate || '—'}`,
-      margin,
-      y + 4,
-    );
-    y += 12;
-
-    // ── Section: Initial Investment ──
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Initial Investment', margin, y);
-    y += 2;
-
-    const investmentRows: string[][] = [
-      ['Cameras', `${inputs.numberOfCameras} × $${inputs.cameraCost.toFixed(2)}`, `$${calc.totalCameraCost.toFixed(2)}`],
-      ['Network Switch', '', `$${inputs.switchCost.toFixed(2)}`],
-      ['PC / Server', '', `$${inputs.pcCost.toFixed(2)}`],
-    ];
-    inputs.installationItems.forEach((item) => {
-      investmentRows.push([`Installation: ${item.name}`, '', `$${item.cost.toFixed(2)}`]);
-    });
-    investmentRows.push(['', '', '']);
-    investmentRows.push(['Total Initial Investment', '', `$${calc.totalInitialInvestment.toFixed(2)}`]);
-    inputs.initialContributions.forEach((item) => {
-      investmentRows.push([`Club Contribution: ${item.name}`, '', `-$${item.cost.toFixed(2)}`]);
-    });
-    investmentRows.push(['Net Initial Investment', '', `$${calc.netInitialInvestment.toFixed(2)}`]);
-
-    autoTable(doc, {
-      startY: y,
-      head: [['Item', 'Detail', 'Amount']],
-      body: investmentRows,
-      theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [30, 30, 30], textColor: [170, 255, 0] },
-      columnStyles: { 2: { halign: 'right' } },
-      margin: { left: margin, right: margin },
-    });
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
-
-    // ── Section: Monthly Breakdown ──
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Monthly Breakdown (per camera × ' + inputs.numberOfCameras + ')', margin, y);
-    y += 2;
-
-    const monthlyRows: string[][] = [];
-    inputs.monthlyCostItems.forEach((item) => {
-      monthlyRows.push([`Cost: ${item.name}`, `$${item.cost.toFixed(2)}`, `$${(item.cost * inputs.numberOfCameras).toFixed(2)}`]);
-    });
-    monthlyRows.push(['Total Monthly Cost', '', `$${calc.totalMonthlyCost.toFixed(2)}`]);
-    monthlyRows.push([
-      'Monthly Revenue',
-      `$${inputs.monthlyRevenuePerCamera.toFixed(2)}`,
-      `$${calc.totalMonthlyRevenue.toFixed(2)}`,
-    ]);
-    monthlyRows.push(['Monthly Net Profit', '', `$${calc.monthlyNetProfit.toFixed(2)}`]);
-
-    autoTable(doc, {
-      startY: y,
-      head: [['Item', 'Per Camera', 'Total']],
-      body: monthlyRows,
-      theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [30, 30, 30], textColor: [170, 255, 0] },
-      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
-      margin: { left: margin, right: margin },
-    });
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
-
-    // ── Section: ROI Summary ──
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('ROI Summary', margin, y);
-    y += 2;
-
-    const roiRows: string[][] = [
-      ['Contract Duration', `${calc.contractMonths} months`],
-      ['Grace Period (no billing)', `${calc.graceMonths} months`],
-      ['Active Billing Months', `${calc.billingMonths} months`],
-      ['ROI (from billing start)', calc.roiMonths === Infinity ? 'N/A' : `${calc.roiMonths.toFixed(1)} months`],
-      [
-        'ROI (from contract start)',
-        calc.roiFromContractStart === Infinity ? 'N/A' : `${calc.roiFromContractStart.toFixed(1)} months`,
-      ],
-      ['Total Contract Revenue', `$${calc.totalRevenue.toFixed(2)}`],
-      ['Total Operating Cost', `$${calc.totalOperatingCost.toFixed(2)}`],
-      ['Total Contract Profit', `$${calc.totalContractProfit.toFixed(2)}`],
-    ];
-
-    autoTable(doc, {
-      startY: y,
-      head: [['Metric', 'Value']],
-      body: roiRows,
-      theme: 'grid',
-      styles: { fontSize: 8, cellPadding: 2 },
-      headStyles: { fillColor: [30, 30, 30], textColor: [170, 255, 0] },
-      columnStyles: { 1: { halign: 'right' } },
-      margin: { left: margin, right: margin },
-    });
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
-
-    // ── Section: Monthly Cashflow ──
-    if (calc.cashflow.length > 0) {
-      if (y > 240) {
-        doc.addPage();
-        y = 20;
-      }
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Monthly Cashflow Projection', margin, y);
-      y += 2;
-
-      const cfRows = calc.cashflow.map((cf) => [
-        cf.label,
-        `$${cf.revenue.toFixed(2)}`,
-        `$${cf.cost.toFixed(2)}`,
-        `$${cf.cumulative.toFixed(2)}`,
-      ]);
-
-      autoTable(doc, {
-        startY: y,
-        head: [['Month', 'Revenue', 'Cost', 'Cumulative']],
-        body: cfRows,
-        theme: 'grid',
-        styles: { fontSize: 7, cellPadding: 1.5 },
-        headStyles: { fillColor: [30, 30, 30], textColor: [170, 255, 0] },
-        columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } },
-        margin: { left: margin, right: margin },
-      });
-    }
-
-    // Footer on each page
-    const pageCount = doc.getNumberOfPages();
-    for (let p = 1; p <= pageCount; p++) {
-      doc.setPage(p);
-      doc.setFontSize(8);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(150);
-      doc.text(
-        `Smash Vision — Confidential  |  Page ${p} of ${pageCount}`,
-        pageWidth / 2,
-        doc.internal.pageSize.getHeight() - 10,
-        { align: 'center' },
-      );
-      doc.setTextColor(0);
-    }
-
-    doc.save(`ROI_${(inputs.clubName || 'Club').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
-  };
+  const chartData = useMemo(
+    () =>
+      calc.cashflow.map((cf) => ({
+        label: cf.label,
+        Cumulative: Number(cf.cumulative.toFixed(2)),
+      })),
+    [calc.cashflow],
+  );
 
   // ── Helpers ───────────────────────────────────────────────────────
   const fmt = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -582,7 +427,7 @@ export default function RoiCalculator() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Calculator className="text-sv-lime" size={28} />
           <div>
@@ -590,14 +435,55 @@ export default function RoiCalculator() {
             <p className="text-sv-gray-text text-sm">Estimate return on investment for a new club</p>
           </div>
         </div>
-        <button
-          onClick={exportPDF}
-          className="flex items-center gap-2 bg-sv-lime text-sv-black px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-sv-lime-dark transition-colors"
-        >
-          <Download size={16} />
-          Export PDF
-        </button>
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            className="hidden"
+            onChange={handleImportFile}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center gap-2 bg-sv-dark border border-sv-gray text-sv-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:border-sv-lime hover:text-sv-lime transition-colors"
+          >
+            <Upload size={16} />
+            Import PDF
+          </button>
+          <button
+            onClick={() => setConfirmClear(true)}
+            className="flex items-center gap-2 bg-sv-dark border border-sv-gray text-sv-white px-4 py-2.5 rounded-lg font-semibold text-sm hover:border-red-400 hover:text-red-400 transition-colors"
+          >
+            <Eraser size={16} />
+            Clear
+          </button>
+          <button
+            onClick={() => exportRoiPdf(inputs, calc)}
+            className="flex items-center gap-2 bg-sv-lime text-sv-black px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-sv-lime-dark transition-colors"
+          >
+            <Download size={16} />
+            Export PDF
+          </button>
+        </div>
       </div>
+
+      {/* Import feedback */}
+      {importError && (
+        <div className="flex items-center justify-between bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg px-4 py-2.5 text-sm">
+          <span>{importError}</span>
+          <button onClick={() => setImportError(null)} className="hover:text-red-300 ml-3">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+      {importNotice && (
+        <div className="flex items-center justify-between bg-sv-lime/10 border border-sv-lime/30 text-sv-lime rounded-lg px-4 py-2.5 text-sm">
+          <span>{importNotice}</span>
+          <button onClick={() => setImportNotice(null)} className="hover:text-sv-lime-dark ml-3">
+            <X size={16} />
+          </button>
+        </div>
+      )}
 
       {/* KPI Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -807,6 +693,56 @@ export default function RoiCalculator() {
             </p>
           </section>
 
+          {/* Cumulative Cashflow Chart */}
+          {calc.cashflow.length > 0 && (
+            <section className="bg-sv-dark border border-sv-gray rounded-xl p-5">
+              <h2 className="text-sv-white font-semibold text-base mb-4 flex items-center gap-2">
+                <TrendingUp size={18} className="text-sv-lime" />
+                Break-even Curve
+              </h2>
+              <div className="h-52">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="roiCumulative" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#AAFF00" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="#AAFF00" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2A2A2A" />
+                    <XAxis dataKey="label" tick={{ fill: '#9CA3AF', fontSize: 10 }} interval="preserveStartEnd" />
+                    <YAxis tick={{ fill: '#9CA3AF', fontSize: 10 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#1A1A1A',
+                        border: '1px solid #2A2A2A',
+                        borderRadius: '8px',
+                        color: '#fff',
+                      }}
+                      formatter={(value) => [fmt(Number(value)), 'Cumulative']}
+                    />
+                    <ReferenceLine y={0} stroke="#9CA3AF" strokeDasharray="4 4" />
+                    <Area
+                      type="monotone"
+                      dataKey="Cumulative"
+                      stroke="#AAFF00"
+                      strokeWidth={2}
+                      fill="url(#roiCumulative)"
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              {calc.roiFromContractStart !== Infinity && (
+                <p className="text-xs text-sv-gray-text mt-2">
+                  Break-even reached in month {Math.ceil(calc.roiFromContractStart)} (
+                  {calc.cashflow[Math.min(calc.cashflow.length - 1, Math.max(0, Math.ceil(calc.roiFromContractStart) - 1))]?.label})
+                </p>
+              )}
+            </section>
+          )}
+
           {/* Cashflow Table */}
           {calc.cashflow.length > 0 && (
             <section className="bg-sv-dark border border-sv-gray rounded-xl p-5">
@@ -853,6 +789,16 @@ export default function RoiCalculator() {
           )}
         </div>
       </div>
+
+      {/* Clear confirmation */}
+      <ConfirmDialog
+        open={confirmClear}
+        title="Clear all fields"
+        message="This will reset every field in the ROI calculator. This cannot be undone."
+        confirmLabel="Clear"
+        onConfirm={clearAll}
+        onCancel={() => setConfirmClear(false)}
+      />
     </div>
   );
 }

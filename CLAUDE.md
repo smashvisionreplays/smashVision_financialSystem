@@ -51,7 +51,9 @@ These are NOT columns in the DB — `useCreateTransaction` strips them before in
 ## ROI Calculator
 Page at `/roi`. Inputs: club name, camera cost, # cameras, switch, PC, installation items (dynamic list), contract start date, billing start date, contract months, monthly cost items per camera (× num cameras), monthly revenue per camera, initial club contributions (dynamic list).
 Proration: all months = 30 days. Partial first/last billing months prorated by day.
-PDF export via jsPDF + jspdf-autotable using `/logo.png`.
+- PDF export/import lives in `src/lib/roiPdf.ts` (brand-styled layout per SmashVision_IdentidadDeMarca_2026: dark gradient header, lime #C5F02B accents, marfil #F5F7F1 panels, Poppins fonts loaded from `public/fonts/`).
+- Exported PDFs embed the form inputs as `SVROI1:<base64 JSON>` in PDF keywords metadata → lossless re-import via the Import PDF button. Legacy (pre-redesign, Helvetica) PDFs are parsed from their plain text streams as a fallback.
+- Inputs persist in localStorage under `sv-roi-calculator`; Clear button resets form + storage (ConfirmDialog accepts optional `confirmLabel`).
 
 ## Clubs (camera counts)
 - Padeling Pance: 4 cameras

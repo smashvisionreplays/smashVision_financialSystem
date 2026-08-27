@@ -24,3 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 Thumbs.db
+
+# Other Folders
+sheetsFinances/
+
+# Excel source files — never commit or deploy (public/ is served without auth)
+*.xlsx
