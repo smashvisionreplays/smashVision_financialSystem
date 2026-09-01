@@ -15,7 +15,7 @@ React 19 + TypeScript + Vite + Tailwind CSS + Supabase + Recharts + TanStack Que
 ## File map
 ```
 src/
-├── pages/          Dashboard.tsx, Transactions.tsx, Clubs.tsx, People.tsx, RoiCalculator.tsx
+├── pages/          Dashboard.tsx, Transactions.tsx, Clubs.tsx, People.tsx, RoiCalculator.tsx, Settings.tsx
 ├── components/
 │   ├── layout/     Sidebar.tsx, Layout.tsx
 │   ├── transactions/ TransactionModal.tsx, TransactionFilters.tsx, TransactionTable.tsx
@@ -55,7 +55,10 @@ Proration: all months = 30 days. Partial first/last billing months prorated by d
 - Exported PDFs embed the form inputs as `SVROI1:<base64 JSON>` in PDF keywords metadata → lossless re-import via the Import PDF button. Legacy (pre-redesign, Helvetica) PDFs are parsed from their plain text streams as a fallback.
 - Inputs persist in localStorage under `sv-roi-calculator`; Clear button resets form + storage (ConfirmDialog accepts optional `confirmLabel`).
 
-## Clubs (camera counts)
+## Settings panel
+Page at `/settings` (tabs: Clubs / Categories / People / System). Full CRUD for clubs, categories and people via mutations in `useClubs.ts` / `useCategories.ts` / `usePeople.ts` (each invalidates its own key + `['transactions']` to refresh joins). Transaction types and currencies are shown read-only — they are fixed by DB CHECK constraints and hardcoded financial logic. Deleting a referenced entity leaves transactions intact (FK `ON DELETE SET NULL`); ConfirmDialog shows the reference count.
+
+## Clubs (camera counts, editable in /settings)
 - Padeling Pance: 4 cameras
 - Smash Padel: 2 cameras
 - Padel Nation: 2 cameras (inactive)

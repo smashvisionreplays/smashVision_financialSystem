@@ -271,7 +271,7 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
                   ))}
                 </select>
               ) : (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {clubs?.map((club) => {
                     const isSelected = form.club_ids.includes(club.id);
                     return (
@@ -314,7 +314,7 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
                     const pct = form.club_percentages[club.id] ?? 0;
                     const share = form.usd_amount > 0 ? Number((form.usd_amount * pct / 100).toFixed(2)) : 0;
                     return (
-                      <div key={club.id} className="flex items-center gap-3 text-sm">
+                      <div key={club.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                         <span className="text-sv-white flex-1 min-w-0">
                           {club.name}{' '}
                           <span className="text-sv-gray-text text-xs">({club.number_cameras} cams)</span>
@@ -363,7 +363,7 @@ export default function TransactionModal({ open, transaction, onSubmit, onClose 
                   : 'Person'}
               </label>
               {form.type === 'withdrawal' ? (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {people?.map((person) => {
                     const isSelected = form.person_ids.includes(person.id);
                     return (

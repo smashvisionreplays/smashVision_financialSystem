@@ -7,12 +7,14 @@ const roleLabels: Record<string, string> = {
   founder: 'Founder',
   investor: 'Investor',
   collaborator: 'Collaborator',
+  company: 'Company',
 };
 
 const roleColors: Record<string, string> = {
   founder: 'bg-sv-lime/10 text-sv-lime',
   investor: 'bg-blue-500/10 text-blue-400',
   collaborator: 'bg-amber-500/10 text-amber-400',
+  company: 'bg-purple-500/10 text-purple-400',
 };
 
 export default function People() {

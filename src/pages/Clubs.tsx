@@ -52,7 +52,7 @@ export default function Clubs() {
                 <div>
                   <h3 className="text-sv-white font-semibold text-lg">{club.name}</h3>
                   <p className="text-sv-gray-text text-xs">
-                    {club.city}, {club.country}
+                    {[club.city, club.country].filter(Boolean).join(', ') || '—'}
                   </p>
                 </div>
               </div>

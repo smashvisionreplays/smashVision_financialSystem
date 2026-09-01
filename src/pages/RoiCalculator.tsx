@@ -109,13 +109,13 @@ function EditableList({
                 <input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="flex-1 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white"
+                  className="flex-1 min-w-0 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white"
                 />
                 <input
                   type="number"
                   value={editCost}
                   onChange={(e) => setEditCost(e.target.value)}
-                  className="w-28 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white"
+                  className="w-24 sm:w-28 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white"
                   min="0"
                   step="0.01"
                 />
@@ -156,7 +156,7 @@ function EditableList({
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Item name"
-          className="flex-1 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white placeholder-sv-gray-text"
+          className="flex-1 min-w-0 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white placeholder-sv-gray-text"
           onKeyDown={(e) => e.key === 'Enter' && add()}
         />
         <input
@@ -164,7 +164,7 @@ function EditableList({
           value={newCost}
           onChange={(e) => setNewCost(e.target.value)}
           placeholder={costLabel}
-          className="w-28 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white placeholder-sv-gray-text"
+          className="w-24 sm:w-28 bg-sv-gray border border-sv-gray-light rounded-lg px-3 py-1.5 text-sm text-sv-white placeholder-sv-gray-text"
           min="0"
           step="0.01"
           onKeyDown={(e) => e.key === 'Enter' && add()}
@@ -435,7 +435,7 @@ export default function RoiCalculator() {
             <p className="text-sv-gray-text text-sm">Estimate return on investment for a new club</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <input
             ref={fileInputRef}
             type="file"
