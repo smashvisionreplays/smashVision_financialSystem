@@ -42,7 +42,8 @@ export default function People() {
       totalReimbursements: reimbursements,
       totalWithdrawals: withdrawals,
       totalGapContributions: gapContributions,
-      balance: expenses - reimbursements,
+      // Withdrawals also count as money returned to the person, so they reduce the debt
+      balance: expenses - reimbursements - withdrawals,
       transactionCount: personTx.length,
     };
   });
@@ -107,19 +108,21 @@ export default function People() {
                 </div>
               )}
 
-              <div className="border-t border-sv-gray pt-3 mt-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sv-white text-sm font-medium">Owed Balance</span>
-                  <span className={`font-bold ${balance > 0 ? 'text-amber-400' : 'text-sv-lime'}`}>
-                    {balance > 0 ? formatCurrency(balance) : 'Settled'}
-                  </span>
+              {person.role !== 'company' && (
+                <div className="border-t border-sv-gray pt-3 mt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sv-white text-sm font-medium">Owed Balance</span>
+                    <span className={`font-bold ${balance > 0 ? 'text-amber-400' : 'text-sv-lime'}`}>
+                      {balance > 0 ? formatCurrency(balance) : 'Settled'}
+                    </span>
+                  </div>
+                  <p className="text-sv-gray-text text-xs mt-1">
+                    {balance > 0
+                      ? 'Amount SV still owes this person (expenses − reimbursements − withdrawals)'
+                      : 'Everything paid back via reimbursements and withdrawals'}
+                  </p>
                 </div>
-                <p className="text-sv-gray-text text-xs mt-1">
-                  {balance > 0
-                    ? 'Amount SV still owes this person'
-                    : 'All expenses have been reimbursed'}
-                </p>
-              </div>
+              )}
             </div>
           </div>
         ))}
