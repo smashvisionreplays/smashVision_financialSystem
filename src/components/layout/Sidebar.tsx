@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ArrowLeftRight, Building2, Users, Menu, X, Calculator, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ArrowLeftRight, Building2, Users, Menu, X, Calculator, Settings, LogOut, Boxes } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -8,6 +8,7 @@ const navItems = [
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/clubs', icon: Building2, label: 'Clubs' },
   { to: '/people', icon: Users, label: 'People' },
+  { to: '/inventory', icon: Boxes, label: 'Inventory' },
   { to: '/roi', icon: Calculator, label: 'ROI Calculator' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];

@@ -9,6 +9,7 @@ import Clubs from './pages/Clubs';
 import People from './pages/People';
 import RoiCalculator from './pages/RoiCalculator';
 import Settings from './pages/Settings';
+import Inventory from './pages/Inventory';
 import Login from './pages/Login';
 
 const queryClient = new QueryClient({
@@ -31,6 +32,7 @@ function ProtectedRoutes() {
         <Route path="transactions" element={<Transactions />} />
         <Route path="clubs" element={<Clubs />} />
         <Route path="people" element={<People />} />
+        <Route path="inventory" element={<Inventory />} />
         <Route path="roi" element={<RoiCalculator />} />
         <Route path="settings" element={<Settings />} />
       </Route>

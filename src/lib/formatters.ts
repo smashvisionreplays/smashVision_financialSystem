@@ -1,4 +1,4 @@
-import type { Currency, TransactionType } from '../types';
+import type { Currency, TransactionType, InventoryStatus, InventoryLocationType, InventoryKind } from '../types';
 
 export function formatCurrency(amount: number, currency: Currency = 'USD'): string {
   const symbols: Record<Currency, string> = {
@@ -43,4 +43,33 @@ export const transactionTypeColors: Record<TransactionType, string> = {
   withdrawal: '#F59E0B',
   reimbursement: '#3B82F6',
   gap_contribution: '#8B5CF6',
+};
+
+export const inventoryStatusLabels: Record<InventoryStatus, string> = {
+  in_stock: 'In stock',
+  installed: 'Installed',
+  in_repair: 'In repair',
+  damaged: 'Damaged',
+  retired: 'Retired',
+};
+
+export const inventoryStatusColors: Record<InventoryStatus, string> = {
+  in_stock: '#AAFF00',
+  installed: '#3B82F6',
+  in_repair: '#F59E0B',
+  damaged: '#EF4444',
+  retired: '#9CA3AF',
+};
+
+export const locationTypeLabels: Record<InventoryLocationType, string> = {
+  warehouse: 'Warehouse',
+  club: 'Club',
+  office: 'Office',
+  person: 'Person',
+  other: 'Other',
+};
+
+export const inventoryKindLabels: Record<InventoryKind, string> = {
+  product: 'Product',
+  service: 'Service',
 };
